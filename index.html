@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Estácio Cabo Frio</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+body {
+    font-family: Segoe UI, sans-serif;
+    background: #eef1f5;
+    margin: 0;
+}
+
+/* Base do Topbar */
+.topbar {
+    background: linear-gradient(90deg, #1d7bd8, #19b5c8);
+    color: white;
+    padding: 20px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 25px;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.flex-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+button {
+    background: #1fbf75;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #17a564;
+}
+
+input[type="date"], input[type="text"], input[type="number"], input[type="time"], select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-family: Segoe UI, sans-serif;
+    box-sizing: border-box;
+    width: 100%;
+    background-color: white;
+}
+
+textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-family: monospace;
+    font-size: 13px;
+    box-sizing: border-box;
+    resize: vertical;
+    margin-bottom: 15px;
+    background: #fdfdfd;
+}
+
+/* Estilos das Abas */
+.tabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    background: transparent;
+    color: #666;
+    font-size: 16px;
+    padding: 8px 15px;
+    border-radius: 0;
+}
+
+.tab-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.tab-btn.active {
+    background: transparent;
+    color: #1d7bd8;
+    border-bottom: 3px solid #1d7bd8;
+    margin-bottom: -12px;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Estilos do Formulário Manual */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* CLASSE PARA OS GRÁFICOS */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.chart-container {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* Modificado para suportar o spinner interno */
+}
+
+/* Spinner Interno dos Gráficos */
+.chart-spinner {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(248, 249, 250, 0.85);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    z-index: 10;
+}
+
+.spinner-small {
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #1d7bd8;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+.filter-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+th {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 8px;
+    text-align: left;
+}
+
+td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.progress {
+    height: 14px;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00c853, #00e5ff);
+}
+
+.warning {
+    color: red;
+    font-weight: bold;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* /* --- NOVA ESTRUTURA DE CSS PARA O LOADING (FOGOS E TEXTO) --- */
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    z-index: 100000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.logo-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.pulsing-logo {
+    width: 180px;
+    animation: pulse-animation 1.2s ease-in-out infinite;
+    z-index: 5;
+}
+.loading-text {
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: bold;
+    color: #1d7bd8;
+    font-size: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: pulse-animation 1.2s ease-in-out infinite;
+}
+@keyframes pulse-animation { 
+    0%, 100% { transform: scale(0.98); opacity: 0.8; } 
+    50% { transform: scale(1.02); opacity: 1; } 
+}
+/* Efeito de Fogos Super Intensos */
+/* Efeito de Fogos Clássicos Dourados (Ajustado para Fundo Branco) */
+.logo-container::after {
+    content: '';
+    position: absolute;
+    top: -150px; left: -150px; right: -150px; bottom: -150px; /* Área grande mantida */
+    background-image: 
+        radial-gradient(circle, #f59e0b 3px, transparent 4px), /* Âmbar Escuro */
+        radial-gradient(circle, #fcd34d 3px, transparent 4px), /* Ouro Brilhante */
+        radial-gradient(circle, #fb923c 3px, transparent 4px), /* Laranja Pólvora */
+        radial-gradient(circle, #fff7ed 2px, transparent 3px), /* Creme (Quase Branco para contraste) */
+        radial-gradient(circle, #d97706 3px, transparent 4px), /* Bronze */
+        radial-gradient(circle, #b45309 2px, transparent 3px); /* Marrom Centelha */
+    background-size: 10% 10%, 15% 15%, 12% 12%, 20% 20%, 15% 15%, 10% 10%;
+    background-position: 50% 50%;
+    z-index: 20; /* Garante que fique por cima de TUDO */
+    opacity: 0;
+    pointer-events: none;
+    animation: fireworks-intense 1.8s ease-out infinite; /* Animação intensa mantida */
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+
+<body>
+
+<div id="loadingOverlay" class="loading-overlay">
+    <img src="https://cdn.portal.estacio.br/logotipo_marca_estacio_preto_HOME_d4bc9da518_ed6850a937.svg" class="pulsing-logo" alt="Carregando">
+    <div class="loading-text">FAZ SEU BRILHO!</div>
+</div>
+
+<div class="topbar">
+Carregando...
+</div>
+
+<div class="container">
+    <div class="card">
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="mudarAba(event, 'abaColar')">📋 Colar Planilha</button>
+            <button class="tab-btn" onclick="mudarAba(event, 'abaEditarGeral')">✏️ Editar</button>
+            <button class="tab-btn" onclick="mudarAba(event, 'abaGraficos');">📊 Gráficos</button>
+        </div>
+
+        <div id="abaColar" class="tab-content active">
+            <p style="font-size: 14px; color: #555; margin-top: 0;">Selecione os dados da sua base (incluindo o cabeçalho), copie e cole na caixa abaixo. Colunas inúteis serão ignoradas automaticamente.</p>
+            <textarea id="textoExcel" rows="8" placeholder="Cole aqui os dados copiados do Excel..."></textarea>
+            <div style="display: flex; gap: 10px;">
+                <button id="btnImportar" onclick="importarCopiado()">📥 Importar Dados Colados</button>
+            </div>
+        </div>
+
+        <div id="abaEditarGeral" class="tab-content">
+            <div style="border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #1d7bd8;">🔍 Localizar e Alterar Sala</h4>
+                <p style="font-size: 13px; color: #555;">Cole o ID da aula clicando no botão 📋 na tabela para forçar uma sala específica.</p>
+                <div class="input-group" style="margin-bottom:15px;">
+                    <input type="text" id="inputIdEdicao" placeholder="Ex: ID-A1B2C" style="width: 150px; text-transform:uppercase;">
+                    <button onclick="buscarLinhaEdicao()">Buscar Aula</button>
+                </div>
+                <div id="painelEdicao" style="display:none; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e0e0e0;">
+                    <p id="infoLinhaEdicao" style="font-size:13px; margin-top:0; font-weight:bold; color:#1d7bd8;"></p>
+                    <div class="input-group">
+                        <label>Forçar Sala:</label>
+                        <select id="selectSalaEdicao" style="width:auto;"></select>
+                        <button onclick="salvarLinhaEdicao()" style="background:#1fbf75;">💾 Salvar Alteração</button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4 style="margin-top: 0; color: #1d7bd8;">➕ Inserir Nova Aula Manualmente</h4>
+                <div class="form-grid">
+                    <div class="form-group"><label>Dia da Semana *</label>
+                        <select id="manDia"><option value="SEGUNDA">Segunda-feira</option><option value="TERÇA">Terça-feira</option><option value="QUARTA">Quarta-feira</option><option value="QUINTA">Quinta-feira</option><option value="SEXTA">Sexta-feira</option><option value="SÁBADO">Sábado</option></select>
+                    </div>
+                    <div class="form-group"><label>Início *</label><input type="time" id="manHoraIni" value="07:50"></div>
+                    <div class="form-group"><label>Término *</label><input type="time" id="manHoraFim" value="10:30"></div>
+                    <div class="form-group"><label>Curso</label><input type="text" id="manCurso" placeholder="Ex: DIREITO"></div>
+                    <div class="form-group"><label>Cód. Disciplina</label><input type="text" id="manCodDisc" placeholder="Ex: ARA0574"></div>
+                    <div class="form-group"><label>Nome da Disciplina</label><input type="text" id="manNomDisc" placeholder="Ex: DIREITO DO TRABALHO"></div>
+                    <div class="form-group"><label>Turma</label><input type="text" id="manTurma" placeholder="Ex: 1009"></div>
+                    <div class="form-group"><label>Professor</label><input type="text" id="manProf" placeholder="Ex: ALEX SANDER"></div>
+                    <div class="form-group"><label>Qtd. Alunos *</label><input type="number" id="manAlunos" placeholder="Ex: 36"></div>
+                </div>
+                <button style="background: #1d7bd8;" onclick="adicionarAulaManual()">➕ Adicionar Aula à Memória</button>
+            </div>
+        </div>
+
+        <div id="abaGraficos" class="tab-content">
+            <p style="font-size: 14px; color: #555; margin-top: 0;">Acompanhe os gráficos abaixo. Eles se animam automaticamente após o processamento dos filtros.</p>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div id="spinnerGrafico1" class="chart-spinner" style="display:none;"><div class="spinner-small"></div></div>
+                    <canvas id="graficoDias" style="max-height: 250px;"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div id="spinnerGrafico2" class="chart-spinner" style="display:none;"><div class="spinner-small"></div></div>
+                    <canvas id="graficoCursos" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section flex-row" id="containerHubBase">
+        </div>
+
+    </div>
+
+    <div class="card">
+        <h3>Realocação Inteligente de Salas</h3>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dia</th>
+                        <th>Horário</th>
+                        <th>Período</th>
+                        <th>Curso</th>
+                        <th>Disciplina</th>
+                        <th>Professor</th>
+                        <th>Alunos</th>
+                        <th>Sala Sugerida</th>
+                        <th>Capacidade</th>
+                        <th>% Uso</th>
+                    </tr>
+                </thead>
+                <tbody id="resultado"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// =========================================================
+// BANCO DE DADOS DE ALTA PERFORMANCE (IndexedDB) E GERADOR DE ID
+// =========================================================
+const dbName = "DashboardSalasDB";
+const storeName = "dadosSalas";
+let masterIdCounter = Date.now() % 100000;
+
+function gerarIdUnico() {
+    return "ID-" + (masterIdCounter++).toString(36).toUpperCase();
+}
+
+function initDB(callback) {
+    let request = indexedDB.open(dbName, 1);
+    request.onupgradeneeded = function(e) {
+        let db = e.target.result;
+        if (!db.objectStoreNames.contains(storeName)) {
+            db.createObjectStore(storeName, { keyPath: "id" });
+        }
+    };
+    request.onsuccess = function(e) { callback(e.target.result); };
+    request.onerror = function(e) { console.error("Erro no Banco de Dados:", e); };
+}
+
+function salvarDadosDB(dadosArray) {
+    initDB(function(db) {
+        let tx = db.transaction(storeName, "readwrite");
+        let store = tx.objectStore(storeName);
+        store.put({ id: 1, payload: dadosArray });
+    });
+}
+
+function carregarDadosDB(callback) {
+    initDB(function(db) {
+        let tx = db.transaction(storeName, "readonly");
+        let store = tx.objectStore(storeName);
+        let request = store.get(1);
+        request.onsuccess = function() {
+            callback(request.result ? request.result.payload : []);
+        };
+    });
+}
+
+function salvarManutencaoDB() {
+    initDB(function(db) {
+        let tx = db.transaction(storeName, "readwrite");
+        let store = tx.objectStore(storeName);
+        store.put({ id: 2, bloqueadas: salasEmManutencao, projetorRuim: salasProjetorRuim });
+    });
+}
+
+function carregarManutencaoDB(callback) {
+    initDB(function(db) {
+        let tx = db.transaction(storeName, "readonly");
+        let store = tx.objectStore(storeName);
+        let request = store.get(2);
+        request.onsuccess = function() {
+            if (request.result) {
+                salasEmManutencao = request.result.bloqueadas || [];
+                salasProjetorRuim = request.result.projetorRuim || [];
+            }
+            callback();
+        };
+    });
+}
+
+function limparDB() {
+    initDB(function(db) {
+        let tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).clear();
+    });
+}
+
+
+// =========================================================
+// INJEÇÃO DE CSS E RESPONSIVIDADE (BACK-END OTIMIZADO)
+// =========================================================
+const customStyles = document.createElement('style');
+customStyles.innerHTML = `
+    body { padding-top: 60px; } 
+    
+    .topbar {
+        position: fixed !important;
+        top: 0; left: 0; width: 100%; z-index: 9999;
+        display: grid !important;
+        grid-template-columns: 260px 1fr 220px; 
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 10px 25px !important;
+        height: 60px !important; 
+        box-sizing: border-box;
+    }
+
+    .topbar-title {
+        grid-column: 2; text-align: center; font-size: 22px;
+        font-weight: bold; margin: 0; white-space: nowrap;
+    }
+
+    .header-photo {
+        grid-column: 1; justify-self: start;
+        width: 220px; height: 41px; border-radius: 6px; 
+        object-fit: cover; border: 2px solid rgba(255,255,255,0.8);
+        box-shadow: 0 0 0 rgba(45, 212, 191, 0.4);
+        animation: pulse-glow 2s infinite; margin-left: 20px; 
+    }
+
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(45, 212, 191, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+    }
+
+    #watermark-assinatura {
+        grid-column: 3; justify-self: end; text-align: right;
+    }
+
+    th { background: #f1f5f9 !important; color: #475569 !important; font-weight: 600 !important; border-bottom: 2px solid #e2e8f0 !important; font-size: 11px; letter-spacing: 0.3px; white-space: nowrap; padding: 10px 4px !important; }
+    td { padding: 6px 4px !important; font-size: 11px !important; }
+    
+    .btn-copiar-id {
+        background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 4px;
+        font-size: 10px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-copiar-id:hover { background: #1d7bd8; color: white; border-color: #1d7bd8; }
+
+    th select { max-width: 100%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+    .modal-overlay-custom {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;
+        backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease;
+    }
+    .modal-overlay-custom.active { display: flex; opacity: 1; }
+    .modal-content-custom {
+        background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 700px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateY(-20px); transition: transform 0.3s ease;
+        display: flex; flex-direction: column;
+    }
+    .modal-overlay-custom.active .modal-content-custom { transform: translateY(0); }
+
+    #filtrosOcultosContainer {
+        display: flex; flex-wrap: wrap; gap: 15px; overflow: hidden;
+        max-height: 0; opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #filtrosOcultosContainer.expandido {
+        max-height: 500px; opacity: 1; margin-top: 15px; overflow: visible;
+    }
+
+    @media (max-width: 1366px) {
+        .topbar { grid-template-columns: 180px 1fr 160px; padding: 10px 15px !important; }
+        .topbar-title { font-size: 18px !important; }
+        .header-photo { width: 140px; height: 35px; margin-left: 10px; }
+        .container { padding: 10px !important; }
+        .card { padding: 12px !important; margin-bottom: 12px !important; }
+        th, td { padding: 4px 2px !important; font-size: 10px !important; }
+        .custom-dd { width: 105px !important; }
+        .custom-dd-header { font-size: 10px !important; padding: 4px 5px !important; }
+        th select { font-size: 9px !important; padding: 2px 0 !important; }
+    }
+    
+    .custom-dd { position: relative; width: 140px; font-family: Segoe UI, sans-serif; font-weight: normal; }
+    .custom-dd-header { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; font-size: 12px; color: #334155; height: 32px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; }
+    .custom-dd-header:hover { border-color: #94a3b8; }
+    .custom-dd-body { display: none; position: absolute; top: 100%; left: 0; width: 220px; background: white; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; margin-top: 4px; padding: 6px; box-sizing: border-box; }
+    .custom-dd-body input { width: 100%; padding: 8px 8px 8px 25px; margin-bottom: 5px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 12px; box-sizing: border-box; background: #f8fafc url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 8px center; }
+    .custom-dd-list { max-height: 180px; overflow-y: auto; }
+    .custom-dd-option { padding: 8px 10px; font-size: 12px; cursor: pointer; border-radius: 4px; color: #334155; }
+    .custom-dd-option:hover { background: #e2e8f0; color: #0f172a; }
+    
+    .btn-manut-on { background: #eef1f5; color: #333; border: 1px solid #ccc; }
+    .btn-manut-off { background: #dc3545; color: white; border: 1px solid #dc3545; text-decoration: line-through; }
+    .btn-manut-warn { background: #fef08a; color: #b45309; border: 1px solid #f59e0b; font-weight: bold; }
+`;
+document.head.appendChild(customStyles);
+
+
+// =========================================================
+// LÓGICA DE DADOS GLOBAIS E DEFINIÇÕES
+// =========================================================
+let dados = [];
+let windowDadosResultantes = []; 
+let renderId = 0; 
+let chartDiasInstancia = null;
+let chartCursosInstancia = null;
+
+let salasEmManutencao = []; 
+let salasProjetorRuim = []; 
+
+let filtrosSelecao = {
+    dia: 'TODOS', turno: 'TODOS', periodo: 'TODOS', curso: 'TODOS', disciplina: 'TODOS',
+    turma: 'TODOS', prof: 'TODOS', alunos: 'TODOS', sala: 'TODOS', capacidade: 'TODOS'
+};
+
+let salas = [
+    {name:"C111", cap:40}, {name:"C306", cap:40}, {name:"C301", cap:42}, {name:"C109", cap:45},
+    {name:"C308", cap:46}, {name:"C304", cap:47}, {name:"C219", cap:48}, {name:"C305", cap:49},
+    {name:"C211", cap:51}, {name:"C212", cap:53}, {name:"C218", cap:53}, {name:"C209", cap:54},
+    {name:"C210", cap:56}, {name:"C112", cap:58}, {name:"C208", cap:58}, {name:"E101", cap:60},
+    {name:"E102", cap:60}, {name:"E103", cap:60}, {name:"E104", cap:60}, {name:"C203", cap:60},
+    {name:"G101", cap:61}, {name:"G104", cap:61}, {name:"C204", cap:61}, {name:"C216", cap:61},
+    {name:"G102", cap:62}, {name:"G103", cap:63}, {name:"G107", cap:63}, {name:"C220", cap:64},
+    {name:"C307", cap:75}, {name:"G105", cap:80}, {name:"G106", cap:81}, {name:"C302", cap:95},
+    {name:"C206", cap:102},{name:"C105", cap:105},{name:"C214", cap:120}
+];
+
+window.addEventListener('DOMContentLoaded', () => {
+    carregarDadosDB(function(d) {
+        if (d && d.length > 0) {
+            let mudou = false;
+            d.forEach(linha => {
+                if(!linha.idUnico) { linha.idUnico = gerarIdUnico(); mudou = true; }
+            });
+            dados = d;
+            if(mudou) salvarDadosDB(dados);
+            atualizarFiltrosDinamicos();
+        }
+    });
+    carregarManutencaoDB(function() {
+        popularSalasManutencao();
+    });
+});
+
+setTimeout(() => {
+    // CUSTOMIZAÇÃO DO CABEÇALHO
+    let topbar = document.querySelector('.topbar');
+    if (topbar) {
+        topbar.innerHTML = '<span class="topbar-title">Alocação Inteligente de Salas</span>';
+        if (!document.getElementById('header-photo-id')) {
+            let img = document.createElement('img');
+            img.id = 'header-photo-id';
+            img.className = 'header-photo';
+            img.src = 'https://scontent.fgig14-2.fna.fbcdn.net/v/t39.30808-6/647087786_26301116102910304_8124795922222058351_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeGoxw5xspEOE_4A40mW-mTktL_8VaCuiaC0v_xVoK6JoMVirtswjamMdu42fkEoAAXpxtZmY8f4Wskk6EUwUmcL&_nc_ohc=HT6-_2JnP7kQ7kNvwFJFvoK&_nc_oc=AdkeqP7SSBEMkjw6bkZWZserWaIzMBWKD_2PT24pZJ3_9ub77W4Es8hGrGIPnC0oRyc&_nc_zt=23&_nc_ht=scontent.fgig14-2.fna&_nc_gid=khRzHHK6iW-cKEVm_uWE8w&_nc_ss=8&oh=00_AfwLt2vVH3tSvaIU5Ro3DUh_RSpHaq2gTAST8hRz6zb5ew&oe=69B2878F';
+            img.alt = 'Campus';
+            topbar.insertBefore(img, topbar.firstChild);
+        }
+        if (!document.getElementById('watermark-assinatura')) {
+            let wm = document.createElement('div');
+            wm.id = 'watermark-assinatura';
+            wm.innerHTML = `<span style="font-family: Segoe UI, Arial, sans-serif; font-size: 11px; font-weight: 600; opacity: 0.6; letter-spacing: 0.5px; color: #fff;">Feito por Miquéias Ramos da Silva</span>`;
+            wm.style.pointerEvents = 'none';
+            topbar.appendChild(wm);
+        }
+    }
+
+    let tabs = document.querySelector('.tabs');
+    let card = document.querySelector('.card');
+    
+    // ABA MANUTENÇÃO E EDIÇÃO
+    if (tabs && card && !document.getElementById('btnAbaManut')) {
+        let btnTab = document.createElement('button');
+        btnTab.className = 'tab-btn';
+        btnTab.id = 'btnAbaManut';
+        btnTab.innerHTML = '🛠️ Manutenção';
+        btnTab.onclick = (e) => mudarAba(e, 'abaManutencao');
+        tabs.appendChild(btnTab);
+
+        let divManut = document.createElement('div');
+        divManut.id = 'abaManutencao';
+        divManut.className = 'tab-content';
+        divManut.innerHTML = `
+            <p style="font-size: 13px; color: #555; margin-top: 0;">Altere o status da sala clicando sobre ela:<br>
+            <span style="display:inline-block; margin-right:15px; margin-top:5px;">⚪ <b>Padrão</b></span>
+            <span style="display:inline-block; margin-right:15px; color:#dc3545;">🔴 <b>1 Clique: Bloqueada</b></span>
+            <span style="display:inline-block; color:#b45309;">🟡 <b>2 Cliques: Proj. Ruim (Com aviso)</b></span></p>
+            <div id="gridSalasManut" class="form-grid" style="grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));"></div>
+        `;
+        let target = document.getElementById('abaGraficos');
+        target.parentNode.insertBefore(divManut, target.nextSibling);
+        popularSalasManutencao();
+    }
+
+ 
+
+    // POPUP MODAL DA ABA DE COLAR EXCEL
+    let abaColar = document.getElementById('abaColar');
+    let tx = document.getElementById('textoExcel');
+    let btnImportar = document.getElementById('btnImportar');
+
+    if (tx && btnImportar && abaColar && !document.getElementById('modalImportacao')) {
+        let divFlexOriginal = btnImportar.parentNode;
+        
+        let modalOverlay = document.createElement('div');
+        modalOverlay.id = 'modalImportacao';
+        modalOverlay.className = 'modal-overlay-custom';
+        
+        let modalContent = document.createElement('div');
+        modalContent.className = 'modal-content-custom';
+
+        let modalHeader = document.createElement('div');
+        modalHeader.style.display = 'flex';
+        modalHeader.style.justifyContent = 'space-between';
+        modalHeader.style.alignItems = 'center';
+        modalHeader.innerHTML = '<h3 style="margin:0; color:#333;">📋 Importar Base de Dados</h3>';
+        
+        let closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✖';
+        closeBtn.style.cssText = 'background:none; border:none; color:#dc3545; font-size:18px; cursor:pointer; font-weight:bold; padding:0;';
+        closeBtn.onclick = () => modalOverlay.classList.remove('active');
+        modalHeader.appendChild(closeBtn);
+
+        modalContent.appendChild(modalHeader);
+        
+        tx.style.height = '250px';
+        tx.style.opacity = '1';
+        tx.style.padding = '12px';
+        tx.style.borderWidth = '1px';
+        tx.style.margin = '15px 0';
+        tx.style.display = 'block';
+        modalContent.appendChild(tx);
+
+        let divBtn = document.createElement('div');
+        divBtn.style.textAlign = 'right';
+        divBtn.style.display = 'flex';
+        divBtn.style.justifyContent = 'flex-end';
+        divBtn.style.gap = '10px';
+
+        // Botão para carregar arquivo físico (Versão Corrigida)
+        let btnFile = document.createElement('button');
+        btnFile.innerHTML = '📂 Carregar Arquivo Excel';
+        btnFile.style.background = '#2563eb';
+        btnFile.onclick = () => {
+            const inp = document.createElement('input');
+            inp.type = 'file';
+            // Extensões explícitas para o navegador não ignorar
+            inp.accept = ".xlsx, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
+            
+            inp.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    processarArquivoCascata(e);
+                }
+            });
+            inp.click();
+        };
+
+        divBtn.appendChild(btnFile);
+        divBtn.appendChild(btnImportar);
+        modalContent.appendChild(divBtn);
+
+        modalOverlay.appendChild(modalContent);
+        document.body.appendChild(modalOverlay);
+
+        if (divFlexOriginal) divFlexOriginal.remove();
+        
+        abaColar.innerHTML = '';
+        abaColar.style.display = 'none';
+
+        let btnTabColar = document.querySelector('button[onclick*="abaColar"]');
+        if (btnTabColar) {
+            btnTabColar.removeAttribute('onclick'); 
+            btnTabColar.classList.remove('active');
+            
+            btnTabColar.onclick = (e) => {
+                e.preventDefault();
+                modalOverlay.classList.add('active');
+                setTimeout(() => tx.focus(), 100);
+            };
+        }
+    }
+    
+    if (dados.length > 0) {
+        atualizarFiltrosDinamicos();
+        executarProcessamento(); 
+    }
+
+}, 100);
+
+let linhaEditando = null;
+
+function mostrarLoading() {
+    document.body.style.cursor = 'wait';
+    let overlay = document.getElementById('loadingOverlay');
+    if(overlay) overlay.style.display = 'flex';
+}
+
+function ocultarLoading() {
+    document.body.style.cursor = 'default';
+    let overlay = document.getElementById('loadingOverlay');
+    if(overlay) overlay.style.display = 'none';
+}
+
+function copiarParaAreaDeTransferencia(texto) {
+    navigator.clipboard.writeText(texto).then(() => {
+    }).catch(err => {
+        console.error('Erro ao copiar', err);
+    });
+}
+
+function buscarLinhaEdicao() {
+    let idBusca = document.getElementById('inputIdEdicao').value.trim().toUpperCase();
+    linhaEditando = dados.find(d => (d.idUnico || '').toUpperCase() === idBusca);
+    
+    if (linhaEditando) {
+        document.getElementById('infoLinhaEdicao').innerHTML = `
+            ${linhaEditando.curso} - ${linhaEditando.nomDisc} <br>
+            <span style="color:#555; font-weight:normal;">${linhaEditando.diaSemana} (${linhaEditando.horaIni} às ${linhaEditando.horaFim}) | Prof: ${linhaEditando.prof} | Alunos: ${linhaEditando.alunos}</span>
+        `;
+        let sel = document.getElementById('selectSalaEdicao');
+        sel.innerHTML = '<option value="">-- Remover Força Manual (Modo Auto) --</option>';
+        salas.forEach(s => {
+            let opt = document.createElement('option');
+            opt.value = s.name;
+            opt.text = s.name + ` (Cap: ${s.cap})`;
+            if (linhaEditando.salaManual === s.name) opt.selected = true;
+            sel.appendChild(opt);
+        });
+        document.getElementById('painelEdicao').style.display = 'block';
+    } else {
+        alert("ID da aula não encontrado na base de dados.");
+        document.getElementById('painelEdicao').style.display = 'none';
+    }
+}
+
+function salvarLinhaEdicao() {
+    if (!linhaEditando) return;
+    let salaSelecionada = document.getElementById('selectSalaEdicao').value;
+    linhaEditando.salaManual = salaSelecionada;
+    salvarDadosDB(dados);
+    alert("Alteração salva na memória fixa!");
+    executarProcessamento();
+}
+
+function popularSalasManutencao() {
+    let grid = document.getElementById('gridSalasManut');
+    if (!grid) return;
+    grid.innerHTML = '';
+    let salasOrd = [...salas].sort((a,b) => a.name.localeCompare(b.name));
+    
+    salasOrd.forEach(s => {
+        let btn = document.createElement('button');
+        if (salasEmManutencao.includes(s.name)) btn.className = 'btn-manut-off';
+        else if (salasProjetorRuim.includes(s.name)) btn.className = 'btn-manut-warn';
+        else btn.className = 'btn-manut-on';
+        
+        btn.innerText = s.name;
+        btn.style.padding = "8px 0";
+        btn.onclick = () => alternarManutencao(s.name, btn);
+        grid.appendChild(btn);
+    });
+}
+
+function alternarManutencao(nomeSala, btnElement) {
+    if (salasEmManutencao.includes(nomeSala)) {
+        salasEmManutencao = salasEmManutencao.filter(n => n !== nomeSala);
+        salasProjetorRuim.push(nomeSala);
+        btnElement.className = 'btn-manut-warn';
+    } else if (salasProjetorRuim.includes(nomeSala)) {
+        salasProjetorRuim = salasProjetorRuim.filter(n => n !== nomeSala);
+        btnElement.className = 'btn-manut-on';
+    } else {
+        salasEmManutencao.push(nomeSala);
+        btnElement.className = 'btn-manut-off';
+    }
+    salvarManutencaoDB();
+    executarProcessamento();
+}
+
+function extrairNumeroPeriodo(texto) {
+    let numStr = String(texto).replace(/[^0-9]/g, '');
+    let num = parseInt(numStr);
+    return isNaN(num) ? 0 : num;
+}
+
+function normalizarTexto(texto) {
+    if(!texto) return "";
+    return String(texto).trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function classificarTurno(horaIni) {
+    if (!horaIni) return "";
+    let h = parseInt(horaIni.substring(0, 2));
+    if (h < 12) return "Manhã";
+    if (h < 18) return "Tarde";
+    return "Noite";
+}
+
+function ehPrimeiroPeriodo(row) {
+    let t = normalizarTexto(row.turma);
+    return t.startsWith('10') || t.includes('CALOURO'); 
+}
+
+function getPrioridadeSala(nomeSala, isPrimeiroPeriodo) {
+    let bloco = nomeSala.charAt(0).toUpperCase();
+    let numStr = nomeSala.replace(/[^0-9]/g, '');
+    let numero = numStr ? parseInt(numStr) : 0;
+
+    if (numero >= 300) return 99;
+
+    if (isPrimeiroPeriodo) {
+        if (bloco === 'E') return 1;
+        if (bloco === 'G') return 2;
+        if (bloco === 'F') return 3;
+        if (bloco === 'C') return numero < 200 ? 4 : 5;
+    } else {
+        if (bloco === 'G') return 1;
+        if (bloco === 'E') return 2;
+        if (bloco === 'F') return 3;
+        if (bloco === 'C') return numero < 200 ? 4 : 5;
+    }
+    return 10; 
+}
+
+
+// =========================================================
+// SISTEMA HÍBRIDO DE CARREGAMENTO (TABELA RÁPIDA / GRÁFICOS 2s)
+// =========================================================
+
+function executarProcessamento() {
+    // 1) Inicia o carregamento visual da tela inteira
+    mostrarLoading(); 
+    
+    // 2) Inicia o loading dos gráficos que vai rodar de forma independente
+    let sp1 = document.getElementById('spinnerGrafico1');
+    let sp2 = document.getElementById('spinnerGrafico2');
+    if(sp1) sp1.style.display = 'flex';
+    if(sp2) sp2.style.display = 'flex';
+
+    // 3) Processa a tabela rapidamente (ex: 0.5 seg) e libera a tela principal (sem travar a página)
+    setTimeout(() => {
+        processar(false); 
+        ocultarLoading();
+    }, 600);
+
+    // 4) Processa e libera os gráficos respeitando rigorosamente 2 segundos
+    setTimeout(() => {
+        atualizarGraficos(); 
+        if(sp1) sp1.style.display = 'none';
+        if(sp2) sp2.style.display = 'none';
+    }, 2400);
+}
+
+function executarRecalculo() {
+    mostrarLoading(); 
+    let sp1 = document.getElementById('spinnerGrafico1');
+    let sp2 = document.getElementById('spinnerGrafico2');
+    if(sp1) sp1.style.display = 'flex';
+    if(sp2) sp2.style.display = 'flex';
+
+    setTimeout(() => {
+        processar(true); 
+        ocultarLoading();
+    }, 500);
+
+    setTimeout(() => {
+        atualizarGraficos(); 
+        if(sp1) sp1.style.display = 'none';
+        if(sp2) sp2.style.display = 'none';
+    }, 2000);
+}
+
+function construirFiltrosAvancados() {
+    let container = document.getElementById('containerHubBase');
+    if (!container) return;
+
+    container.innerHTML = '';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = '15px';
+
+    // Linha 1: Filtros Essenciais + Botão 'Processar'
+    let divFiltros = document.createElement('div');
+    divFiltros.style.display = 'flex';
+    divFiltros.style.gap = '15px';
+    divFiltros.style.alignItems = 'center';
+    divFiltros.style.width = '100%';
+    divFiltros.style.flexWrap = 'wrap';
+
+let grpData = document.createElement('div');
+    grpData.className = 'input-group';
+    grpData.innerHTML = `
+        <label style="font-size:12px;">Dia da Semana:</label>
+        <div class="custom-dd" id="dd-dia">
+            <div class="custom-dd-header" onclick="alternarListaSuspensa('dia')"><span id="lbl-dia">TODOS</span> <span>▼</span></div>
+            <div class="custom-dd-body" id="body-dia">
+                <input type="text" placeholder="Pesquisar..." onkeyup="filtrarListaSuspensa('dia', this.value)">
+                <div class="custom-dd-list" id="list-dia"></div>
+            </div>
+        </div>
+        <input type="hidden" id="dataInicio" value="">
+        <input type="hidden" id="dataFim" value="">
+    `;
+    divFiltros.appendChild(grpData);
+
+    let grpTurno = document.createElement('div');
+    grpTurno.className = 'input-group';
+    grpTurno.innerHTML = `
+        <label style="font-size:12px;">Turno:</label>
+        <div class="custom-dd" id="dd-turno">
+            <div class="custom-dd-header" onclick="alternarListaSuspensa('turno')"><span id="lbl-turno">Todos</span> <span>▼</span></div>
+            <div class="custom-dd-body" id="body-turno">
+                <input type="text" placeholder="Pesquisar..." onkeyup="filtrarListaSuspensa('turno', this.value)">
+                <div class="custom-dd-list" id="list-turno"></div>
+            </div>
+        </div>
+    `;
+    divFiltros.appendChild(grpTurno);
+
+    // BOTAO PROCESSAR ADICIONADO AO LADO DO TURNO
+    let btnProcessar = document.createElement('button');
+    btnProcessar.id = 'btnProcessar';
+    btnProcessar.innerHTML = '▶️ Processar Dados';
+    btnProcessar.onclick = executarProcessamento; // Passou a ser manual conforme solicitado
+    divFiltros.appendChild(btnProcessar);
+
+    // Linha 2: Outros Botões
+    let divBotoes = document.createElement('div');
+    divBotoes.style.display = 'flex';
+    divBotoes.style.gap = '10px';
+    divBotoes.style.alignItems = 'center';
+    divBotoes.style.width = '100%';
+    divBotoes.style.flexWrap = 'wrap';
+    divBotoes.style.borderTop = '1px solid #e0e0e0';
+    divBotoes.style.paddingTop = '15px';
+
+    let btnRecalcular = document.createElement('button');
+    btnRecalcular.innerText = '🔄 Nova Opção';
+    btnRecalcular.style.background = '#8b5cf6';
+    btnRecalcular.onclick = executarRecalculo;
+
+    let btnExportar = document.createElement('button');
+    btnExportar.innerText = '⬇️ CSV';
+    btnExportar.style.background = '#10b981';
+    btnExportar.onclick = exportarCSV;
+
+    let btnLimpar = document.createElement('button');
+    btnLimpar.innerText = '🗑️ Limpar';
+    btnLimpar.style.background = '#dc3545';
+    btnLimpar.onclick = limparMemoria;
+
+    let btnMaisFiltros = document.createElement('button');
+    btnMaisFiltros.id = 'btnMaisFiltros';
+    btnMaisFiltros.innerText = '🔽 Mais Filtros';
+    btnMaisFiltros.style.background = 'transparent';
+    btnMaisFiltros.style.color = '#1d7bd8';
+    btnMaisFiltros.style.border = '1px solid #1d7bd8';
+    btnMaisFiltros.onclick = toggleMaisFiltros;
+
+    divBotoes.appendChild(btnRecalcular);
+    divBotoes.appendChild(btnExportar);
+    divBotoes.appendChild(btnLimpar);
+    divBotoes.appendChild(btnMaisFiltros);
+
+    // Linha 3: Filtros Ocultos 
+    let divOcultos = document.createElement('div');
+    divOcultos.id = 'filtrosOcultosContainer';
+
+    const camposOcultos = [
+        { id: 'periodo', label: 'Período:' }, 
+        { id: 'curso', label: 'Curso:' },
+        { id: 'disciplina', label: 'Matéria:' },
+        { id: 'turma', label: 'Turma:' },
+        { id: 'prof', label: 'Professor:' },
+        { id: 'alunos', label: 'Alunos:' },
+        { id: 'sala', label: 'Sala Sug.:' },
+        { id: 'capacidade', label: 'Capac.:' }
+    ];
+
+    camposOcultos.forEach(f => {
+        let div = document.createElement('div');
+        div.className = 'input-group';
+        div.innerHTML = `
+            <label style="font-size:12px;">${f.label}</label>
+            <div class="custom-dd" id="dd-${f.id}">
+                <div class="custom-dd-header" onclick="alternarListaSuspensa('${f.id}')"><span id="lbl-${f.id}">Todos</span> <span>▼</span></div>
+                <div class="custom-dd-body" id="body-${f.id}">
+                    <input type="text" placeholder="Pesquisar..." onkeyup="filtrarListaSuspensa('${f.id}', this.value)">
+                    <div class="custom-dd-list" id="list-${f.id}"></div>
+                </div>
+            </div>
+        `;
+        divOcultos.appendChild(div);
+    });
+
+    container.appendChild(divFiltros);
+    container.appendChild(divBotoes);
+    container.appendChild(divOcultos);
+
+    document.getElementById('dataInicio').onchange = () => { 
+        document.getElementById("dataFim").value = document.getElementById("dataInicio").value;
+        sincronizarDataComDia(); 
+    };
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-dd')) {
+            document.querySelectorAll('.custom-dd-body').forEach(b => b.style.display = 'none');
+        }
+    });
+
+    prepararCabecalhoTabela();
+}
+
+function toggleMaisFiltros() {
+    let container = document.getElementById('filtrosOcultosContainer');
+    let btn = document.getElementById('btnMaisFiltros');
+    if (container.classList.contains('expandido')) {
+        container.classList.remove('expandido');
+        btn.innerText = '🔽 Mais Filtros';
+    } else {
+        container.classList.add('expandido');
+        btn.innerText = '🔼 Menos Filtros';
+    }
+}
+
+function exportarCSV() {
+    if (!windowDadosResultantes || windowDadosResultantes.length === 0) {
+        alert("Não há dados processados para exportar. Clique em 'Processar Dados' primeiro.");
+        return;
+    }
+
+    // Configuração do cabeçalho conforme solicitado
+    const headers = ["dia", "Curso", "Horário", "Período", "Disciplina", "Professor(a)", "Salas"];
+    
+    // Inicia o conteúdo com o BOM para garantir acentuação correta no Excel brasileiro
+    let csvContent = "\uFEFF"; 
+    csvContent += headers.join(";") + "\n";
+
+    // Mapeia os dados processados para as colunas desejadas
+    windowDadosResultantes.forEach(row => {
+        const dia = row.diaSemana || "";
+        const curso = row.curso || "";
+        // Unifica início e término no campo Horário
+        const horario = `${row.horaIni} às ${row.horaFim}`;
+        const periodo = row.periodoAcad || "";
+        const disciplina = row.nomDisc || "";
+        const professor = row.prof || "";
+        // Limpa a sala de avisos como "Forçada" ou "Proj. Ruim"
+        const sala = row.salaSugerida.replace("🔒 Forçada", "").replace("⚠️ Proj. Ruim", "").trim();
+
+        const linhaMapeada = [
+            `"${dia}"`,
+            `"${curso}"`,
+            `"${horario}"`,
+            `"${periodo}"`,
+            `"${disciplina}"`,
+            `"${professor}"`,
+            `"${sala}"`
+        ];
+
+        csvContent += linhaMapeada.join(";") + "\n";
+    });
+
+    // Criação do link de download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "planejamento_salas_estacio.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function sincronizarDataComDia() {
+    let dIni = document.getElementById("dataInicio").value;
+    
+    if (dIni) {
+        let p = dIni.split('-');
+        let dateObj = new Date(p[0], p[1] - 1, p[2]);
+        let diasVisuais = ['DOMINGO', 'SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO'];
+        let diasReais = ['DOMINGO', 'SEGUNDA', 'TERCA', 'QUARTA', 'QUINTA', 'SEXTA', 'SABADO'];
+        let idx = dateObj.getDay();
+        selecionarOpcao('dia', diasReais[idx], diasVisuais[idx]);
+    }
+}
+
+function alternarListaSuspensa(id) {
+    let body = document.getElementById(`body-${id}`);
+    let estaVisivel = body.style.display === 'block';
+    document.querySelectorAll('.custom-dd-body').forEach(b => b.style.display = 'none');
+    if (!estaVisivel) body.style.display = 'block';
+}
+
+function filtrarListaSuspensa(id, termo) {
+    let pesquisa = normalizarTexto(termo);
+    let itens = document.querySelectorAll(`#list-${id} .custom-dd-option`);
+    itens.forEach(item => {
+        if (item.innerText === 'Todos' || normalizarTexto(item.innerText).includes(pesquisa)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function selecionarOpcao(id, valorReal, textoVisivel) {
+    filtrosSelecao[id] = valorReal;
+    let lbl = document.getElementById(`lbl-${id}`);
+    if(lbl) lbl.innerText = textoVisivel;
+    
+    let body = document.getElementById(`body-${id}`);
+    if(body) body.style.display = 'none';
+    
+    let inp = document.querySelector(`#body-${id} input`);
+    if(inp) inp.value = "";
+    
+    filtrarListaSuspensa(id, "");
+    
+    // ATENÇÃO: Retirado o processamento automático daqui.
+    // O usuário agora escolherá os filtros e depois clicará no Botão "Processar Dados".
+}
+
+function atualizarFiltrosDinamicos() {
+    let sets = { dia: new Set(), periodo: new Set(), curso: new Set(), disciplina: new Set(), turma: new Set(), prof: new Set(), alunos: new Set() };
+    
+    sets.dia.add('SEGUNDA'); sets.dia.add('TERÇA'); sets.dia.add('QUARTA'); sets.dia.add('QUINTA'); sets.dia.add('SEXTA'); sets.dia.add('SÁBADO');
+
+    dados.forEach(d => {
+        if(d.diaSemana) sets.dia.add(d.diaSemana.toUpperCase());
+        if(d.curso) sets.curso.add(d.curso.toUpperCase());
+        if(d.nomDisc) {
+            let m = d.codDisc ? `${d.codDisc.trim()} - ${d.nomDisc.trim()}` : d.nomDisc.trim();
+            sets.disciplina.add(m.toUpperCase());
+        }
+        if(d.turma) sets.turma.add(d.turma.toUpperCase());
+        if(d.prof) sets.prof.add(d.prof.toUpperCase());
+        if(d.alunos) sets.alunos.add(String(d.alunos));
+        if(d.periodoAcad) sets.periodo.add(d.periodoAcad.toUpperCase());
+    });
+
+    let salasSet = new Set(), capSet = new Set();
+    salas.forEach(s => { salasSet.add(s.name); capSet.add(String(s.cap)); });
+    salasSet.add('SEM SALA');
+
+    function popularLista(id, conj) {
+        let div = document.getElementById(`list-${id}`);
+        if (!div) return;
+        let html = `<div class="custom-dd-option" onclick="selecionarOpcao('${id}', 'TODOS', 'Todos')"><strong>Todos</strong></div>`;
+        Array.from(conj).sort().forEach(val => {
+            if (val && val.trim() !== '') {
+                let vEscape = val.replace(/'/g, "\\'");
+                html += `<div class="custom-dd-option" onclick="selecionarOpcao('${id}', '${vEscape}', '${vEscape}')">${val}</div>`;
+            }
+        });
+        div.innerHTML = html;
+        filtrosSelecao[id] = 'TODOS';
+        let lbl = document.getElementById(`lbl-${id}`);
+        if(lbl) lbl.innerText = 'Todos';
+    }
+
+    popularLista('dia', sets.dia);
+    popularLista('periodo', sets.periodo);
+    popularLista('curso', sets.curso);
+    popularLista('disciplina', sets.disciplina);
+    popularLista('turma', sets.turma);
+    popularLista('prof', sets.prof);
+    popularLista('alunos', sets.alunos);
+    popularLista('sala', salasSet);
+    popularLista('capacidade', capSet);
+
+    let divTurno = document.getElementById(`list-turno`);
+    if(divTurno) {
+        divTurno.innerHTML = `
+            <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'TODOS', 'Todos')"><strong>Todos</strong></div>
+            <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'MANHÃ', 'Manhã')">Manhã</div>
+            <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'TARDE', 'Tarde')">Tarde</div>
+            <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'NOITE', 'Noite')">Noite</div>
+            <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'MANHÃ/NOITE', 'Manhã/Noite')">Manhã/Noite</div>
+        `;
+        filtrosSelecao['turno'] = 'TODOS';
+        let lblTurno = document.getElementById(`lbl-turno`);
+        if (lblTurno) lblTurno.innerText = 'Todos';
+    }
+}
+
+function prepararCabecalhoTabela() {
+    let theadTr = document.querySelector("table thead tr");
+    if (theadTr && !document.getElementById('sortPercUso')) {
+        
+        if (!document.getElementById('th-id')) {
+            let thId = document.createElement("th");
+            thId.id = "th-id";
+            thId.innerText = "📋";
+            thId.title = "Copiar ID da Aula";
+            thId.style.width = "20px";
+            theadTr.insertBefore(thId, theadTr.firstChild);
+        }
+
+        let ths = theadTr.querySelectorAll("th");
+        
+        function injetarFiltroOrdenacaoNum(th, id, labelBase) {
+            th.innerHTML = `
+                <select id="${id}" style="background: transparent; color: inherit; font-weight: 600; border: none; font-size: 11px; cursor: pointer; outline: none; text-transform: uppercase; width:100%;" onchange="aplicarFiltrosTabela('${id}')">
+                    <option value="" style="color:#334155;">${labelBase} ↕</option>
+                    <option value="asc" style="color:#334155;">MENOR ↑</option>
+                    <option value="desc" style="color:#334155;">MAIOR ↓</option>
+                </select>
+            `;
+        }
+        
+        injetarFiltroOrdenacaoNum(ths[3], 'sortPeriodo', 'PERÍODO');
+        injetarFiltroOrdenacaoNum(ths[7], 'sortAlunos', 'ALUNOS');
+        injetarFiltroOrdenacaoNum(ths[9], 'sortCapacidade', 'CAPAC.');
+        injetarFiltroOrdenacaoNum(ths[10], 'sortPercUso', '% USO');
+    }
+}
+
+construirFiltrosAvancados();
+
+
+// =========================================================
+// PROCESSAMENTO INTELIGENTE
+// =========================================================
+
+function temConflitoHorario(intervalosOcupados, horaIniNova, horaFimNova) {
+    if (!horaIniNova || !horaFimNova) return false;
+    for (let intervalo of intervalosOcupados) {
+        if (horaIniNova < intervalo.fim && horaFimNova > intervalo.inicio) return true; 
+    }
+    return false; 
+}
+
+function escolherSalaInteligente(row, mapaDeOcupacao, historicoProfs, variar = false) {
+    let dia = normalizarTexto(row.diaSemana);
+    let qtdAlunos = row.alunos;
+    let prof = normalizarTexto(row.prof);
+    let isPrimPer = ehPrimeiroPeriodo(row);
+    
+    if (!mapaDeOcupacao[dia]) mapaDeOcupacao[dia] = {};
+    if (!historicoProfs[dia]) historicoProfs[dia] = {};
+
+    if (row.salaManual && row.salaManual !== "") {
+        let salaForce = salas.find(s => s.name === row.salaManual);
+        if (salaForce) {
+            if (!mapaDeOcupacao[dia][salaForce.name]) mapaDeOcupacao[dia][salaForce.name] = [];
+            mapaDeOcupacao[dia][salaForce.name].push({ inicio: row.horaIni, fim: row.horaFim });
+            return salaForce;
+        }
+    }
+
+    if (prof !== "" && (!variar || Math.random() > 0.5)) {
+        let salaAnterior = historicoProfs[dia][prof];
+        if (salaAnterior && !salasEmManutencao.includes(salaAnterior)) {
+            let salaObj = salas.find(s => s.name === salaAnterior);
+            if (salaObj && qtdAlunos <= (salaObj.cap * 1.05)) {
+                let horarios = mapaDeOcupacao[dia][salaAnterior] || [];
+                if (!temConflitoHorario(horarios, row.horaIni, row.horaFim)) {
+                    mapaDeOcupacao[dia][salaAnterior].push({ inicio: row.horaIni, fim: row.horaFim });
+                    return salaObj; 
+                }
+            }
+        }
+    }
+
+    let pass1Folga = [];   
+    let pass2Cheio = [];   
+    let pass3Estouro = []; 
+
+    for (let sala of salas) {
+        if (salasEmManutencao.includes(sala.name)) continue;
+
+        let horariosDaSala = mapaDeOcupacao[dia][sala.name] || [];
+        if (!temConflitoHorario(horariosDaSala, row.horaIni, row.horaFim)) {
+            let cap = sala.cap;
+            
+            if (qtdAlunos <= (cap * 1.05)) {
+                let limiteFolga = isPrimPer ? 0.80 : 0.95; 
+                
+                if (qtdAlunos <= (cap * limiteFolga)) pass1Folga.push(sala);
+                else if (qtdAlunos <= cap) pass2Cheio.push(sala);
+                else pass3Estouro.push(sala);
+            }
+        }
+    }
+
+    let salasDisponiveis = pass1Folga.length > 0 ? pass1Folga : (pass2Cheio.length > 0 ? pass2Cheio : pass3Estouro);
+
+    if (salasDisponiveis.length > 0) {
+        salasDisponiveis.sort((a, b) => {
+            let prioA = getPrioridadeSala(a.name, isPrimPer);
+            let prioB = getPrioridadeSala(b.name, isPrimPer);
+            
+            if (variar) {
+                prioA += Math.random() * 0.5;
+                prioB += Math.random() * 0.5;
+            }
+
+            if (prioA !== prioB) return prioA - prioB;
+            return a.cap - b.cap;
+        });
+
+        let salaEscolhida = salasDisponiveis[0];
+        
+        if (!mapaDeOcupacao[dia][salaEscolhida.name]) mapaDeOcupacao[dia][salaEscolhida.name] = [];
+        mapaDeOcupacao[dia][salaEscolhida.name].push({ inicio: row.horaIni, fim: row.horaFim });
+        
+        if (prof !== "") historicoProfs[dia][prof] = salaEscolhida.name;
+        
+        return salaEscolhida;
+    }
+
+    return {name: "SEM SALA", cap: 0};
+}
+
+function processar(variar = false) {
+    if (dados.length === 0) return;
+
+    let dIni = document.getElementById("dataInicio").value;
+    let dFim = document.getElementById("dataFim").value;
+    let fs = filtrosSelecao;
+
+    let dadosParaProcessar = dados.filter(row => {
+        if (dIni && dFim && row.dataIni) {
+            let dataNormal = converterDataComparacao(row.dataIni);
+            if (dataNormal < dIni || dataNormal > dFim) return false;
+        }
+        if (fs.dia !== 'TODOS' && normalizarTexto(row.diaSemana) !== normalizarTexto(fs.dia)) return false;
+        if (fs.turno !== 'TODOS') {
+            let tClassificado = normalizarTexto(classificarTurno(row.horaIni));
+            if (fs.turno === 'MANHÃ/NOITE') {
+                if (tClassificado !== 'MANHA' && tClassificado !== 'NOITE') return false;
+            } else {
+                if (tClassificado !== normalizarTexto(fs.turno)) return false;
+            }
+        }
+        if (fs.periodo !== 'TODOS' && normalizarTexto(row.periodoAcad) !== normalizarTexto(fs.periodo)) return false;
+        if (fs.curso !== 'TODOS' && normalizarTexto(row.curso) !== normalizarTexto(fs.curso)) return false;
+        let mat = row.codDisc ? `${row.codDisc.trim()} - ${row.nomDisc.trim()}` : row.nomDisc.trim();
+        if (fs.disciplina !== 'TODOS' && normalizarTexto(mat) !== normalizarTexto(fs.disciplina)) return false;
+        if (fs.turma !== 'TODOS' && normalizarTexto(row.turma) !== normalizarTexto(fs.turma)) return false;
+        if (fs.prof !== 'TODOS' && normalizarTexto(row.prof) !== normalizarTexto(fs.prof)) return false;
+        if (fs.alunos !== 'TODOS' && String(row.alunos) !== fs.alunos) return false;
+        return true;
+    });
+
+    let todosOrdem = [...dadosParaProcessar];
+    todosOrdem.sort((a, b) => {
+        if (a.diaSemana !== b.diaSemana) return a.diaSemana.localeCompare(b.diaSemana);
+        return a.horaIni.localeCompare(b.horaIni); 
+    });
+
+    let ocupacaoMap = {}; 
+    let historicoProfs = {}; 
+    
+    windowDadosResultantes = [];
+    
+    for (let i = 0; i < todosOrdem.length; i++) {
+        let row = todosOrdem[i];
+        let sala = escolherSalaInteligente(row, ocupacaoMap, historicoProfs, variar);
+        let perc = sala.cap ? parseFloat(((row.alunos / sala.cap) * 100).toFixed(1)) : 0;
+        
+        windowDadosResultantes.push({
+            ...row,
+            salaSugerida: sala.name,
+            capacidade: sala.cap,
+            percUso: perc
+        });
+    }
+
+    aplicarFiltrosTabela(); 
+}
+
+function aplicarFiltrosTabela(fonteModificada) {
+    if (!windowDadosResultantes || windowDadosResultantes.length === 0) return;
+    
+    if (fonteModificada) {
+        ['sortPeriodo', 'sortAlunos', 'sortCapacidade', 'sortPercUso'].forEach(id => {
+            if (id !== fonteModificada && document.getElementById(id)) {
+                document.getElementById(id).value = "";
+            }
+        });
+    }
+
+    let valPeriodo = document.getElementById('sortPeriodo') ? document.getElementById('sortPeriodo').value : "";
+    let valAlunos = document.getElementById('sortAlunos') ? document.getElementById('sortAlunos').value : "";
+    let valCap = document.getElementById('sortCapacidade') ? document.getElementById('sortCapacidade').value : "";
+    let valPerc = document.getElementById('sortPercUso') ? document.getElementById('sortPercUso').value : "";
+    
+    let fs = filtrosSelecao;
+    
+    let filtrado = windowDadosResultantes.filter(row => {
+        if (fs.sala !== 'TODOS' && normalizarTexto(row.salaSugerida) !== normalizarTexto(fs.sala)) return false;
+        if (fs.capacidade !== 'TODOS' && String(row.capacidade) !== fs.capacidade) return false;
+        return true;
+    });
+
+    if (valPeriodo === 'asc') filtrado.sort((a, b) => extrairNumeroPeriodo(a.periodoAcad) - extrairNumeroPeriodo(b.periodoAcad));
+    else if (valPeriodo === 'desc') filtrado.sort((a, b) => extrairNumeroPeriodo(b.periodoAcad) - extrairNumeroPeriodo(a.periodoAcad));
+    else if (valAlunos === 'asc') filtrado.sort((a, b) => a.alunos - b.alunos);
+    else if (valAlunos === 'desc') filtrado.sort((a, b) => b.alunos - a.alunos);
+    else if (valCap === 'asc') filtrado.sort((a, b) => a.capacidade - b.capacidade);
+    else if (valCap === 'desc') filtrado.sort((a, b) => b.capacidade - a.capacidade);
+    else if (valPerc === 'asc') filtrado.sort((a, b) => a.percUso - b.percUso);
+    else if (valPerc === 'desc') filtrado.sort((a, b) => b.percUso - a.percUso);
+
+    renderizarTabela(filtrado);
+}
+
+function renderizarTabela(dadosParaRenderizar) {
+    let tbody = document.getElementById("resultado");
+    tbody.innerHTML = "";
+    
+    renderId++; 
+    let myRenderId = renderId; 
+    let index = 0;
+    let tamanhoLote = 500; 
+
+    function cascata() {
+        if (myRenderId !== renderId) return; 
+
+        let fragment = document.createDocumentFragment();
+        let fimLote = Math.min(index + tamanhoLote, dadosParaRenderizar.length);
+
+        for (; index < fimLote; index++) {
+            let row = dadosParaRenderizar[index];
+            let tr = document.createElement("tr");
+            let classeSemSala = row.salaSugerida === "SEM SALA" ? "warning" : "";
+            
+            let horarioExibicao = row.horaIni;
+            if(horarioExibicao.length > 5) horarioExibicao = horarioExibicao.substring(0, 5);
+
+            let datasStr = "-";
+            if (row.dataIni && row.dataFimAloc) {
+                datasStr = `<br><span style="font-size:10px; color:#64748b; font-weight:normal;">${formatarDataVisual(row.dataIni)} a ${formatarDataVisual(row.dataFimAloc)}</span>`;
+            } else if (row.dataIni) {
+                datasStr = `<br><span style="font-size:10px; color:#64748b; font-weight:normal;">A partir de ${formatarDataVisual(row.dataIni)}</span>`;
+            }
+
+            let nomeTurno = classificarTurno(row.horaIni);
+            let turnoStr = `<span style="font-size:10px; color:#64748b; font-weight:normal; text-transform:uppercase;">${nomeTurno}</span><br>`;
+
+            let widthBar = Math.min(row.percUso, 100);
+            let styleBarraVermelha = row.percUso > 100 ? 'background: linear-gradient(90deg, #ef4444, #b91c1c);' : '';
+
+            let avisoProjetor = salasProjetorRuim.includes(row.salaSugerida) ? `<span style="font-size:10px; color:#d97706; font-weight:bold; display:block; line-height:1;">⚠️ Proj. Ruim</span>` : '';
+            let avisoForcado = row.salaManual ? `<span style="font-size:10px; color:#1d7bd8; font-weight:bold; display:block; line-height:1;">🔒 Forçada</span>` : '';
+
+            let discUnificadaStr = `
+                <div style="font-size: 9px; color: #64748b; font-family: monospace; letter-spacing: -0.5px;">${row.turma} | ${row.codDisc}</div>
+                <div style="font-weight: 600; color: #333;">${row.nomDisc}</div>
+            `;
+
+            tr.innerHTML = `
+                <td>
+                    <button class="btn-copiar-id" title="Copiar ID: ${row.idUnico}" onclick="copiarParaAreaDeTransferencia('${row.idUnico}')">📋</button>
+                </td>
+                <td><strong>${row.diaSemana}</strong>${datasStr}</td>
+                <td>${turnoStr}${horarioExibicao}</td>
+                <td style="font-weight: 600; color: #475569;">${row.periodoAcad || '-'}</td>
+                <td>${row.curso}</td>
+                <td>${discUnificadaStr}</td>
+                <td>${row.prof}</td>
+                <td>${row.alunos}</td>
+                <td class="${classeSemSala}">${avisoForcado}${avisoProjetor}${row.salaSugerida}</td>
+                <td>${row.capacidade}</td>
+                <td>
+                    <div class="progress">
+                        <div class="progress-bar" style="width:${widthBar}%; ${styleBarraVermelha}"></div>
+                    </div>
+                    ${row.percUso}%
+                </td>
+            `;
+            fragment.appendChild(tr);
+        }
+
+        tbody.appendChild(fragment);
+
+        if (index < dadosParaRenderizar.length) {
+            requestAnimationFrame(cascata);
+        }
+    }
+    cascata();
+}
+
+
+// =========================================================
+// FUNÇÕES UTILITÁRIAS DE CÁLCULO E IMPORTAÇÃO
+// =========================================================
+
+function atualizarGraficos() {
+    let base = windowDadosResultantes.length > 0 ? windowDadosResultantes : dados;
+    if (base.length === 0) return;
+
+    let dIni = document.getElementById("dataInicio").value;
+    let dFim = document.getElementById("dataFim").value;
+    let fs = filtrosSelecao;
+
+    let filtrado = base.filter(row => {
+        if (dIni && dFim && row.dataIni) {
+            let dataA = converterDataComparacao(row.dataIni);
+            if (dataA < dIni || dataA > dFim) return false;
+        }
+        if (fs.dia !== 'TODOS' && normalizarTexto(row.diaSemana) !== normalizarTexto(fs.dia)) return false;
+        
+        if (fs.turno !== 'TODOS') {
+            let tClass = normalizarTexto(classificarTurno(row.horaIni));
+            if (fs.turno === 'MANHÃ/NOITE') {
+                if (tClass !== 'MANHA' && tClass !== 'NOITE') return false;
+            } else {
+                if (tClass !== normalizarTexto(fs.turno)) return false;
+            }
+        }
+
+        if (fs.periodo !== 'TODOS' && normalizarTexto(row.periodoAcad) !== normalizarTexto(fs.periodo)) return false;
+        if (fs.curso !== 'TODOS' && normalizarTexto(row.curso) !== normalizarTexto(fs.curso)) return false;
+        let mat = row.codDisc ? `${row.codDisc.trim()} - ${row.nomDisc.trim()}` : row.nomDisc.trim();
+        if (fs.disciplina !== 'TODOS' && normalizarTexto(mat) !== normalizarTexto(fs.disciplina)) return false;
+        if (fs.prof !== 'TODOS' && normalizarTexto(row.prof) !== normalizarTexto(fs.prof)) return false;
+        if (fs.sala !== 'TODOS' && row.salaSugerida && normalizarTexto(row.salaSugerida) !== normalizarTexto(fs.sala)) return false;
+        if (fs.capacidade !== 'TODOS' && row.capacidade && String(row.capacidade) !== fs.capacidade) return false;
+        
+        return true;
+    });
+
+    let alunosPorDia = { "SEGUNDA": 0, "TERCA": 0, "QUARTA": 0, "QUINTA": 0, "SEXTA": 0, "SABADO": 0 };
+    let alunosPorCurso = {};
+
+    filtrado.forEach(d => {
+        let diaNormal = normalizarTexto(d.diaSemana);
+        if (alunosPorDia[diaNormal] !== undefined) alunosPorDia[diaNormal] += d.alunos;
+        let cNormal = d.curso ? d.curso : "OUTROS";
+        alunosPorCurso[cNormal] = (alunosPorCurso[cNormal] || 0) + d.alunos;
+    });
+
+    let dadosDias = [alunosPorDia["SEGUNDA"], alunosPorDia["TERCA"], alunosPorDia["QUARTA"], alunosPorDia["QUINTA"], alunosPorDia["SEXTA"], alunosPorDia["SABADO"]];
+    let cursosOrdenados = Object.entries(alunosPorCurso).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    let labelsCursos = cursosOrdenados.map(c => c[0]);
+    let dadosCursos = cursosOrdenados.map(c => c[1]);
+
+    if(labelsCursos.length === 0) { labelsCursos = ["Sem Dados"]; dadosCursos = [0]; }
+
+    if (chartDiasInstancia) {
+        chartDiasInstancia.data.datasets[0].data = dadosDias;
+        chartDiasInstancia.update();
+    } else {
+        let ctxDias = document.getElementById('graficoDias').getContext('2d');
+        chartDiasInstancia = new Chart(ctxDias, {
+            type: 'bar',
+            data: { labels: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"], datasets: [{ label: 'Total de Alunos', data: dadosDias, backgroundColor: '#1d7bd8', borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Volume de Alunos por Dia' } } }
+        });
+    }
+
+    if (chartCursosInstancia) {
+        chartCursosInstancia.data.labels = labelsCursos;
+        chartCursosInstancia.data.datasets[0].data = dadosCursos;
+        chartCursosInstancia.update(); 
+    } else {
+        let ctxCursos = document.getElementById('graficoCursos').getContext('2d');
+        chartCursosInstancia = new Chart(ctxCursos, {
+            type: 'doughnut',
+            data: { labels: labelsCursos, datasets: [{ data: dadosCursos, backgroundColor: ['#1d7bd8', '#19b5c8', '#1fbf75', '#f6a821', '#e53935'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Top 5 Cursos ' } } }
+        });
+    }
+}
+
+function converterDataComparacao(valorData) {
+    if (!valorData) return "";
+    let dataStr = String(valorData).trim();
+    if (dataStr.includes("/")) {
+        let p = dataStr.split("/");
+        return p[0].length === 4 ? `${p[0]}-${p[1]}-${p[2]}` : `${p[2]}-${p[1]}-${p[0]}`;
+    }
+    return dataStr;
+}
+
+function formatarDataVisual(valorData) {
+    if (!valorData) return "";
+    let dataStr = String(valorData).trim();
+    if (dataStr.includes("-")) {
+        let p = dataStr.split("-");
+        return p[0].length === 4 ? `${p[2]}/${p[1]}/${p[0]}` : dataStr;
+    }
+    return dataStr;
+}
+
+function importarCopiado() {
+    let texto = document.getElementById("textoExcel").value.trim();
+    if (!texto) { alert("Cole os dados da planilha!"); return; }
+
+    let btn = document.getElementById("btnImportar");
+    let txtOriginal = btn.innerHTML;
+    btn.innerHTML = "⏳ Importando...";
+    btn.disabled = true;
+
+    setTimeout(() => {
+        let linhas = texto.split('\n');
+        if (linhas.length < 2) { alert("Copie os cabeçalhos das colunas."); btn.innerHTML = txtOriginal; btn.disabled = false; return; }
+
+        function encontrarIndice(cabs, chaves) {
+            for (let i = 0; i < cabs.length; i++) {
+                let cLimpo = cabs[i].replace(/_/g, " ");
+                for (let k of chaves) { if (cLimpo.includes(k)) return i; }
+            }
+            return -1;
+        }
+
+        let cabs = linhas[0].split('\t').map(col => col.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+        
+        let iDia = encontrarIndice(cabs, ["DIA DA SEMAN"]);
+        let iCurso = encontrarIndice(cabs, ["NOM CURSO"]);
+        let iHoraIni = encontrarIndice(cabs, ["MINDEHH INI"]);
+        let iHoraFim = encontrarIndice(cabs, ["MAXDEHH FIM"]);
+        let iCodDisc = encontrarIndice(cabs, ["COD DISCIPLIN"]);
+        let iNomDisc = encontrarIndice(cabs, ["NOM DISCIPLINA"]);
+        let iTurma = encontrarIndice(cabs, ["COD TURM"]);
+        let iProf = encontrarIndice(cabs, ["NOM PROFESSOR"]);
+        let iAlunos = encontrarIndice(cabs, ["QTD ALUNOS"]);
+        let iPerAcad = encontrarIndice(cabs, ["ID PERIODO", "PERIODO"]);
+        
+        let iDataIni = -1, iDataFim = -1;
+        for (let i = 0; i < cabs.length; i++) {
+            let cl = cabs[i].replace(/_/g, " ");
+            if (cl.includes("ALOCACA") && !cl.includes("FIM")) iDataIni = i;
+            if (cl.includes("DT FIM") || cl.includes("FIM ALOCACA")) iDataFim = i;
+        }
+        if (iDataIni === -1) iDataIni = encontrarIndice(cabs, ["ALOCACA"]);
+        if (iDataFim === -1) iDataFim = encontrarIndice(cabs, ["DT FIM"]);
+
+        let novos = [];
+        let index = 1;
+
+        function lote() {
+            let limit = Math.min(index + 5000, linhas.length);
+            for (; index < limit; index++) {
+                let v = linhas[index].split('\t');
+                if (v.length <= 1 && v[0].trim() === "") continue;
+                novos.push({
+                    idUnico: gerarIdUnico(),
+                    diaSemana: v[iDia !== -1 ? iDia : -1] || "", curso: v[iCurso !== -1 ? iCurso : -1] || "",
+                    horaIni: v[iHoraIni !== -1 ? iHoraIni : -1] || "", horaFim: v[iHoraFim !== -1 ? iHoraFim : -1] || "",
+                    codDisc: v[iCodDisc !== -1 ? iCodDisc : -1] || "", turma: v[iTurma !== -1 ? iTurma : -1] || "",
+                    nomDisc: v[iNomDisc !== -1 ? iNomDisc : -1] || "", prof: v[iProf !== -1 ? iProf : -1] || "",
+                    alunos: parseInt(v[iAlunos !== -1 ? iAlunos : -1]) || 0,
+                    dataIni: v[iDataIni !== -1 ? iDataIni : -1] || "", dataFimAloc: v[iDataFim !== -1 ? iDataFim : -1] || "",
+                    periodoAcad: v[iPerAcad !== -1 ? iPerAcad : -1] || ""
+                });
+            }
+            if (index < linhas.length) requestAnimationFrame(lote);
+            else {
+                dados = dados.concat(novos);
+                salvarDadosDB(dados); 
+                
+                atualizarFiltrosDinamicos(); 
+                executarProcessamento(); 
+                
+                btn.innerHTML = txtOriginal; btn.disabled = false;
+                document.getElementById("textoExcel").value = ""; 
+
+                let mod = document.getElementById('modalImportacao');
+                if (mod) mod.classList.remove('active');
+
+                alert(`✅ ${novos.length} linhas adicionadas!\nElas foram salvas na memória fixa.\nTotal: ${dados.length}.`);
+            }
+        }
+        lote(); 
+    }, 50);
+}
+
+function limparMemoria() {
+    if(confirm("Apagar todos os dados da memória fixa?")) {
+        dados = []; windowDadosResultantes = [];
+        salasEmManutencao = []; salasProjetorRuim = [];
+        limparDB();
+        
+        document.getElementById("resultado").innerHTML = "";
+        if(chartDiasInstancia) { chartDiasInstancia.destroy(); chartDiasInstancia = null; }
+        if(chartCursosInstancia) { chartCursosInstancia.destroy(); chartCursosInstancia = null; }
+        atualizarFiltrosDinamicos();
+        popularSalasManutencao();
+        alert("Memória fixa apagada com sucesso!");
+    }
+}
+
+function adicionarAulaManual() {
+    let dia = document.getElementById("manDia").value;
+    let horaIni = document.getElementById("manHoraIni").value;
+    let horaFim = document.getElementById("manHoraFim").value;
+    let alunos = document.getElementById("manAlunos").value;
+
+    if (!dia || !horaIni || !horaFim || !alunos) { alert("Dia, Horários e Alunos são obrigatórios!"); return; }
+
+    dados.push({
+        idUnico: gerarIdUnico(),
+        diaSemana: dia, horaIni: horaIni, horaFim: horaFim,
+        curso: document.getElementById("manCurso").value.trim().toUpperCase(),
+        codDisc: document.getElementById("manCodDisc").value.trim().toUpperCase(),
+        nomDisc: document.getElementById("manNomDisc").value.trim().toUpperCase(),
+        turma: document.getElementById("manTurma").value.trim().toUpperCase(),
+        prof: document.getElementById("manProf").value.trim().toUpperCase(),
+        alunos: parseInt(alunos) || 0, dataIni: "", dataFimAloc: "", periodoAcad: ""
+    });
+    
+    salvarDadosDB(dados);
+    
+    atualizarFiltrosDinamicos(); 
+    executarProcessamento(); 
+    
+    alert(`Aula adicionada e salva!\nTotal na memória: ${dados.length}.`);
+}
+
+function mudarAba(evento, idAba) {
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById(idAba).classList.add("active");
+    evento.currentTarget.classList.add("active");
+}
+
+function processarArquivoCascata(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    mostrarLoading();
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonBruto = XLSX.utils.sheet_to_json(sheet, { raw: false });
+
+            let index = 0;
+            const total = jsonBruto.length;
+            const tamanhoLote = 500; 
+            let novosDados = [];
+
+            function processarLote() {
+                const fim = Math.min(index + tamanhoLote, total);
+                
+                for (; index < fim; index++) {
+                    const v = jsonBruto[index];
+                    novosDados.push({
+                        idUnico: gerarIdUnico(),
+                        diaSemana: v["Dia da Seman"] || "",
+                        curso: v["NOM_CURSO"] || v["NOM CURSO"] || "",
+                        horaIni: v["MinDeHH_INI_AUL"] || v["MinDeHH INI"] || "",
+                        horaFim: v["MaxDeHH_FIM_AUL"] || v["MaxDeHH FIM"] || "",
+                        codDisc: v["COD_DISCIPLIN"] || v["COD DISCIPLIN"] || "",
+                        turma: v["COD_TURM"] || v["COD TURM"] || "",
+                        nomDisc: v["NOM_DISCIPLINA"] || v["NOM DISCIPLINA"] || "",
+                        prof: v["NOM_PROFESSOR"] || v["NOM PROFESSOR"] || "",
+                        alunos: parseInt(v["QTD_ALUNOS_MATRICULADO"]) || parseInt(v["QTD ALUNOS"]) || 0,
+                        dataIni: v["ALOCACA"] || "",
+                        dataFimAloc: v["DT_FIM_ALOCACA"] || v["DT FIM"] || "",
+                        periodoAcad: v["ID_PERIODO"] || v["ID PERIODO"] || v["PERIODO"] || ""
+                    });
+                }
+
+                if (index < total) {
+                    requestAnimationFrame(processarLote); // Modelo Cascata
+                } else {
+                    dados = dados.concat(novosDados);
+                    salvarDadosDB(dados);
+                    atualizarFiltrosDinamicos();
+                    executarProcessamento();
+                    ocultarLoading();
+                    const modal = document.getElementById('modalImportacao');
+                    if (modal) modal.classList.remove('active');
+                    alert(`✅ Sucesso! ${total} linhas processadas e salvas.`);
+                }
+            }
+            processarLote();
+        } catch (err) {
+            ocultarLoading();
+            alert("Erro ao ler o arquivo Excel. Verifique o formato.");
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+</script>
+</body>
+</html>
