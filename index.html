@@ -119,6 +119,7 @@ textarea {
 
 .tab-content {
     display: none;
+    padding: 5px 20px; /* Cria o respiro/borda invisível nas laterais */
 }
 
 .tab-content.active {
@@ -162,7 +163,7 @@ textarea {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative; /* Modificado para suportar o spinner interno */
+    position: relative;
 }
 
 /* Spinner Interno dos Gráficos */
@@ -236,7 +237,6 @@ td {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* /* --- NOVA ESTRUTURA DE CSS PARA O LOADING (FOGOS E TEXTO) --- */
 .loading-overlay {
     display: none;
     position: fixed;
@@ -273,25 +273,24 @@ td {
     0%, 100% { transform: scale(0.98); opacity: 0.8; } 
     50% { transform: scale(1.02); opacity: 1; } 
 }
-/* Efeito de Fogos Super Intensos */
-/* Efeito de Fogos Clássicos Dourados (Ajustado para Fundo Branco) */
+
 .logo-container::after {
     content: '';
     position: absolute;
-    top: -150px; left: -150px; right: -150px; bottom: -150px; /* Área grande mantida */
+    top: -150px; left: -150px; right: -150px; bottom: -150px;
     background-image: 
-        radial-gradient(circle, #f59e0b 3px, transparent 4px), /* Âmbar Escuro */
-        radial-gradient(circle, #fcd34d 3px, transparent 4px), /* Ouro Brilhante */
-        radial-gradient(circle, #fb923c 3px, transparent 4px), /* Laranja Pólvora */
-        radial-gradient(circle, #fff7ed 2px, transparent 3px), /* Creme (Quase Branco para contraste) */
-        radial-gradient(circle, #d97706 3px, transparent 4px), /* Bronze */
-        radial-gradient(circle, #b45309 2px, transparent 3px); /* Marrom Centelha */
+        radial-gradient(circle, #f59e0b 3px, transparent 4px),
+        radial-gradient(circle, #fcd34d 3px, transparent 4px),
+        radial-gradient(circle, #fb923c 3px, transparent 4px),
+        radial-gradient(circle, #fff7ed 2px, transparent 3px),
+        radial-gradient(circle, #d97706 3px, transparent 4px),
+        radial-gradient(circle, #b45309 2px, transparent 3px);
     background-size: 10% 10%, 15% 15%, 12% 12%, 20% 20%, 15% 15%, 10% 10%;
     background-position: 50% 50%;
-    z-index: 20; /* Garante que fique por cima de TUDO */
+    z-index: 20; 
     opacity: 0;
     pointer-events: none;
-    animation: fireworks-intense 1.8s ease-out infinite; /* Animação intensa mantida */
+    animation: fireworks-intense 1.8s ease-out infinite;
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
@@ -311,21 +310,26 @@ Carregando...
 <div class="container">
     <div class="card">
         
-        <div class="tabs">
-            <button class="tab-btn active" onclick="mudarAba(event, 'abaColar')">📋 Colar Planilha</button>
+        <div class="tabs" style="display: flex; flex-wrap: wrap; width: 100%;">
+            <button class="tab-btn" onclick="mudarAba(event, 'abaColar')">📋 Colar Planilha</button>
             <button class="tab-btn" onclick="mudarAba(event, 'abaEditarGeral')">✏️ Editar</button>
-            <button class="tab-btn" onclick="mudarAba(event, 'abaGraficos');">📊 Gráficos</button>
+            <button class="tab-btn active" onclick="mudarAba(event, 'abaGraficos');">📊 Gráficos</button>
+            <button class="tab-btn" onclick="mudarAba(event, 'abaMapa')">🗺️ Mapa de Salas</button>
+            
+            <div style="flex-grow: 1;"></div>
+            <button class="tab-btn" onclick="mudarAba(event, 'abaConfig')" style="font-size: 20px; padding: 4px 10px;" title="Configurações">⚙️</button>
         </div>
 
-        <div id="abaColar" class="tab-content active">
+        <div id="abaColar" class="tab-content">
             <p style="font-size: 14px; color: #555; margin-top: 0;">Selecione os dados da sua base (incluindo o cabeçalho), copie e cole na caixa abaixo. Colunas inúteis serão ignoradas automaticamente.</p>
             <textarea id="textoExcel" rows="8" placeholder="Cole aqui os dados copiados do Excel..."></textarea>
             <div style="display: flex; gap: 10px;">
                 <button id="btnImportar" onclick="importarCopiado()">📥 Importar Dados Colados</button>
             </div>
         </div>
-
-        <div id="abaEditarGeral" class="tab-content">
+	
+<div id="abaEditarGeral" class="tab-content">
+            
             <div style="border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
                 <h4 style="margin-top: 0; color: #1d7bd8;">🔍 Localizar e Alterar Sala</h4>
                 <p style="font-size: 13px; color: #555;">Cole o ID da aula clicando no botão 📋 na tabela para forçar uma sala específica.</p>
@@ -342,6 +346,7 @@ Carregando...
                     </div>
                 </div>
             </div>
+
             <div>
                 <h4 style="margin-top: 0; color: #1d7bd8;">➕ Inserir Nova Aula Manualmente</h4>
                 <div class="form-grid">
@@ -361,7 +366,48 @@ Carregando...
             </div>
         </div>
 
-        <div id="abaGraficos" class="tab-content">
+           <div id="abaEditarGeral" class="tab-content">
+            
+            <div style="border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #1d7bd8;">🔍 Localizar e Alterar Sala</h4>
+                <p style="font-size: 13px; color: #555;">Cole o ID da aula clicando no botão 📋 na tabela para forçar uma sala específica.</p>
+                <div class="input-group" style="margin-bottom:15px;">
+                    <input type="text" id="inputIdEdicao" placeholder="Ex: ID-A1B2C" style="width: 150px; text-transform:uppercase;">
+                    <button onclick="buscarLinhaEdicao()">Buscar Aula</button>
+                </div>
+                <div id="painelEdicao" style="display:none; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e0e0e0;">
+                    <p id="infoLinhaEdicao" style="font-size:13px; margin-top:0; font-weight:bold; color:#1d7bd8;"></p>
+                    <div class="input-group">
+                        <label>Forçar Sala:</label>
+                        <select id="selectSalaEdicao" style="width:auto;"></select>
+                        <button onclick="salvarLinhaEdicao()" style="background:#1fbf75;">💾 Salvar Alteração</button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h4 style="margin-top: 0; color: #1d7bd8;">➕ Inserir Nova Aula Manualmente</h4>
+                <div class="form-grid">
+                    <div class="form-group"><label>Dia da Semana *</label>
+                        <select id="manDia"><option value="SEGUNDA">Segunda-feira</option><option value="TERÇA">Terça-feira</option><option value="QUARTA">Quarta-feira</option><option value="QUINTA">Quinta-feira</option><option value="SEXTA">Sexta-feira</option><option value="SÁBADO">Sábado</option></select>
+                    </div>
+                    <div class="form-group"><label>Início *</label><input type="time" id="manHoraIni" value="07:50"></div>
+                    <div class="form-group"><label>Término *</label><input type="time" id="manHoraFim" value="10:30"></div>
+                    <div class="form-group"><label>Curso</label><input type="text" id="manCurso" placeholder="Ex: DIREITO"></div>
+                    <div class="form-group"><label>Cód. Disciplina</label><input type="text" id="manCodDisc" placeholder="Ex: ARA0574"></div>
+                    <div class="form-group"><label>Nome da Disciplina</label><input type="text" id="manNomDisc" placeholder="Ex: DIREITO DO TRABALHO"></div>
+                    <div class="form-group"><label>Turma</label><input type="text" id="manTurma" placeholder="Ex: 1009"></div>
+                    <div class="form-group"><label>Professor</label><input type="text" id="manProf" placeholder="Ex: ALEX SANDER"></div>
+                    <div class="form-group"><label>Qtd. Alunos *</label><input type="number" id="manAlunos" placeholder="Ex: 36"></div>
+                </div>
+                <button style="background: #1d7bd8;" onclick="adicionarAulaManual()">➕ Adicionar Aula à Memória</button>
+            </div>
+            
+        </div>
+            </div>
+        </div>
+
+        <div id="abaGraficos" class="tab-content active">
             <p style="font-size: 14px; color: #555; margin-top: 0;">Acompanhe os gráficos abaixo. Eles se animam automaticamente após o processamento dos filtros.</p>
             <div class="chart-grid">
                 <div class="chart-container">
@@ -373,6 +419,34 @@ Carregando...
                     <canvas id="graficoCursos" style="max-height: 250px;"></canvas>
                 </div>
             </div>
+        </div>
+
+        <div id="abaMapa" class="tab-content">
+            <h4 style="margin-top: 0; color: #1d7bd8; margin-bottom: 5px;">🗺️ Mapa Estrutural do Campus</h4>
+            <p style="font-size: 14px; color: #555; margin-top: 0; margin-bottom: 15px;">
+                Clique no botão da sala para visualizar as aulas alocadas nela.<br>
+                <b>Botão Direito (ou segurar no celular)</b>: Altera o status da sala (Manutenção/Projetor Ruim).
+            </p>
+            
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 12px; color: #856404; display: flex; gap: 15px; align-items: center;">
+                <strong>Legenda de Status:</strong>
+                <span>⚪ Operacional</span>
+                <span>🔴 Bloqueada (Manutenção)</span>
+                <span>🟡 Atenção (Projetor Ruim)</span>
+            </div>
+
+            <div id="mapaSalasContainer" style="display: flex; flex-wrap: wrap; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e0e0e0;">
+            </div>
+            
+            <div id="painelDetalhesSala" style="display:none; margin-top: 20px; padding: 15px; background: white; border: 2px solid #1d7bd8; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h4 id="tituloDetalhesSala" style="margin-top: 0; color: #1d7bd8; border-bottom: 1px solid #eee; padding-bottom: 8px;">Detalhes da Sala</h4>
+                <div id="conteudoDetalhesSala" style="font-size: 13px;"></div>
+            </div>
+        </div>
+
+        <div id="abaConfig" class="tab-content">
+            <h4 style="margin-top: 0; color: #1d7bd8;">⚙️ Preferências de Alocação</h4>
+            <p style="font-size: 13px; color: #555;">Área reservada para alterar regras de filtragem e configurar o cadastro fixo das salas (Em desenvolvimento).</p>
         </div>
 
         <div class="filter-section flex-row" id="containerHubBase">
@@ -451,7 +525,8 @@ function salvarManutencaoDB() {
     initDB(function(db) {
         let tx = db.transaction(storeName, "readwrite");
         let store = tx.objectStore(storeName);
-        store.put({ id: 2, bloqueadas: salasEmManutencao, projetorRuim: salasProjetorRuim });
+        // Agora ele salva as turmas ocultas junto com as salas e projetores!
+        store.put({ id: 2, bloqueadas: salasEmManutencao, projetorRuim: salasProjetorRuim, turmasOcultas: turmasOcultas });
     });
 }
 
@@ -464,6 +539,8 @@ function carregarManutencaoDB(callback) {
             if (request.result) {
                 salasEmManutencao = request.result.bloqueadas || [];
                 salasProjetorRuim = request.result.projetorRuim || [];
+                // Puxa as turmas da memória ao iniciar a página!
+                turmasOcultas = request.result.turmasOcultas || []; 
             }
             callback();
         };
@@ -569,13 +646,9 @@ customStyles.innerHTML = `
     .custom-dd-header:hover { border-color: #94a3b8; }
     .custom-dd-body { display: none; position: absolute; top: 100%; left: 0; width: 220px; background: white; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; margin-top: 4px; padding: 6px; box-sizing: border-box; }
     .custom-dd-body input { width: 100%; padding: 8px 8px 8px 25px; margin-bottom: 5px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 12px; box-sizing: border-box; background: #f8fafc url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 8px center; }
-    .custom-dd-list { max-height: 180px; overflow-y: auto; }
+    .custom-dd-list { max-height: 280px; overflow-y: auto; }
     .custom-dd-option { padding: 8px 10px; font-size: 12px; cursor: pointer; border-radius: 4px; color: #334155; }
     .custom-dd-option:hover { background: #e2e8f0; color: #0f172a; }
-    
-    .btn-manut-on { background: #eef1f5; color: #333; border: 1px solid #ccc; }
-    .btn-manut-off { background: #dc3545; color: white; border: 1px solid #dc3545; text-decoration: line-through; }
-    .btn-manut-warn { background: #fef08a; color: #b45309; border: 1px solid #f59e0b; font-weight: bold; }
 `;
 document.head.appendChild(customStyles);
 
@@ -590,7 +663,9 @@ let chartDiasInstancia = null;
 let chartCursosInstancia = null;
 
 let salasEmManutencao = []; 
-let salasProjetorRuim = []; 
+let salasProjetorRuim = [];
+let salasSelecionadas = [];
+let turmasOcultas = [];
 
 let filtrosSelecao = {
     dia: 'TODOS', turno: 'TODOS', periodo: 'TODOS', curso: 'TODOS', disciplina: 'TODOS',
@@ -623,6 +698,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     carregarManutencaoDB(function() {
         popularSalasManutencao();
+        renderizarMapaSalas();
     });
 });
 
@@ -651,32 +727,6 @@ setTimeout(() => {
     let tabs = document.querySelector('.tabs');
     let card = document.querySelector('.card');
     
-    // ABA MANUTENÇÃO E EDIÇÃO
-    if (tabs && card && !document.getElementById('btnAbaManut')) {
-        let btnTab = document.createElement('button');
-        btnTab.className = 'tab-btn';
-        btnTab.id = 'btnAbaManut';
-        btnTab.innerHTML = '🛠️ Manutenção';
-        btnTab.onclick = (e) => mudarAba(e, 'abaManutencao');
-        tabs.appendChild(btnTab);
-
-        let divManut = document.createElement('div');
-        divManut.id = 'abaManutencao';
-        divManut.className = 'tab-content';
-        divManut.innerHTML = `
-            <p style="font-size: 13px; color: #555; margin-top: 0;">Altere o status da sala clicando sobre ela:<br>
-            <span style="display:inline-block; margin-right:15px; margin-top:5px;">⚪ <b>Padrão</b></span>
-            <span style="display:inline-block; margin-right:15px; color:#dc3545;">🔴 <b>1 Clique: Bloqueada</b></span>
-            <span style="display:inline-block; color:#b45309;">🟡 <b>2 Cliques: Proj. Ruim (Com aviso)</b></span></p>
-            <div id="gridSalasManut" class="form-grid" style="grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));"></div>
-        `;
-        let target = document.getElementById('abaGraficos');
-        target.parentNode.insertBefore(divManut, target.nextSibling);
-        popularSalasManutencao();
-    }
-
- 
-
     // POPUP MODAL DA ABA DE COLAR EXCEL
     let abaColar = document.getElementById('abaColar');
     let tx = document.getElementById('textoExcel');
@@ -720,14 +770,12 @@ setTimeout(() => {
         divBtn.style.justifyContent = 'flex-end';
         divBtn.style.gap = '10px';
 
-        // Botão para carregar arquivo físico (Versão Corrigida)
         let btnFile = document.createElement('button');
         btnFile.innerHTML = '📂 Carregar Arquivo Excel';
         btnFile.style.background = '#2563eb';
         btnFile.onclick = () => {
             const inp = document.createElement('input');
             inp.type = 'file';
-            // Extensões explícitas para o navegador não ignorar
             inp.accept = ".xlsx, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
             
             inp.addEventListener('change', function(e) {
@@ -825,38 +873,90 @@ function salvarLinhaEdicao() {
     executarProcessamento();
 }
 
+// Não precisamos mais da grid antiga
 function popularSalasManutencao() {
-    let grid = document.getElementById('gridSalasManut');
-    if (!grid) return;
-    grid.innerHTML = '';
-    let salasOrd = [...salas].sort((a,b) => a.name.localeCompare(b.name));
-    
-    salasOrd.forEach(s => {
-        let btn = document.createElement('button');
-        if (salasEmManutencao.includes(s.name)) btn.className = 'btn-manut-off';
-        else if (salasProjetorRuim.includes(s.name)) btn.className = 'btn-manut-warn';
-        else btn.className = 'btn-manut-on';
-        
-        btn.innerText = s.name;
-        btn.style.padding = "8px 0";
-        btn.onclick = () => alternarManutencao(s.name, btn);
-        grid.appendChild(btn);
-    });
+    // Mantemos a função vazia apenas para não dar erro no onload, pois o mapa agora é gerado por outra função.
 }
 
-function alternarManutencao(nomeSala, btnElement) {
+function alternarManutencaoMapa(nomeSala) {
     if (salasEmManutencao.includes(nomeSala)) {
         salasEmManutencao = salasEmManutencao.filter(n => n !== nomeSala);
         salasProjetorRuim.push(nomeSala);
-        btnElement.className = 'btn-manut-warn';
     } else if (salasProjetorRuim.includes(nomeSala)) {
         salasProjetorRuim = salasProjetorRuim.filter(n => n !== nomeSala);
-        btnElement.className = 'btn-manut-on';
     } else {
         salasEmManutencao.push(nomeSala);
-        btnElement.className = 'btn-manut-off';
     }
     salvarManutencaoDB();
+    executarProcessamento(); // O recálculo vai renderizar o mapa novamente com a nova cor!
+}
+
+function toggleTurmaBloqueada(turmaNome, event) {
+    if (event) event.stopPropagation();
+
+    let tNorm = normalizarTexto(turmaNome);
+    let itemClicado = event ? event.currentTarget : null;
+    
+    if (turmasOcultas.includes(tNorm)) {
+        turmasOcultas = turmasOcultas.filter(t => t !== tNorm);
+        if (itemClicado) {
+            itemClicado.style.color = '#334155';
+            itemClicado.style.textDecoration = 'none';
+            itemClicado.style.fontWeight = 'normal';
+            itemClicado.innerText = turmaNome; 
+        }
+    } else {
+        turmasOcultas.push(tNorm);
+        if (itemClicado) {
+            itemClicado.style.color = '#dc3545';
+            itemClicado.style.textDecoration = 'line-through';
+            itemClicado.style.fontWeight = 'bold';
+            itemClicado.innerText = '❌ Ocultada: ' + turmaNome; 
+        }
+    }
+}
+
+function confirmarBloqueioTurmas(event) {
+    if (event) event.stopPropagation();
+    
+    let body = document.getElementById('body-turmaBloqueada');
+    if (body) body.style.display = 'none';
+    
+    let lblT = document.getElementById('lbl-turmaBloqueada');
+    if (lblT) lblT.innerText = turmasOcultas.length > 0 ? `${turmasOcultas.length} Ocultadas` : 'Nenhuma';
+    
+    salvarManutencaoDB();
+    atualizarFiltrosDinamicos();
+    executarProcessamento();
+}
+function confirmarBloqueioTurmas(event) {
+    if (event) event.stopPropagation();
+    
+    let body = document.getElementById('body-turmaBloqueada');
+    if (body) body.style.display = 'none';
+    
+    let lblT = document.getElementById('lbl-turmaBloqueada');
+    if (lblT) lblT.innerText = turmasOcultas.length > 0 ? `${turmasOcultas.length} Ocultadas` : 'Nenhuma';
+    
+    salvarManutencaoDB(); 
+    atualizarFiltrosDinamicos();
+    executarProcessamento();
+}
+
+function confirmarBloqueioTurmas(event) {
+    if (event) event.stopPropagation();
+    
+    // 1. Fecha a lista suspensa
+    let body = document.getElementById('body-turmaBloqueada');
+    if (body) body.style.display = 'none';
+    
+    // 2. Atualiza a caixinha informando a quantidade de bloqueadas
+    let lblT = document.getElementById('lbl-turmaBloqueada');
+    if (lblT) lblT.innerText = turmasOcultas.length > 0 ? `${turmasOcultas.length} Ocultadas` : 'Nenhuma';
+    
+    // 3. Salva no banco de dados fixo e RODA O CARREGAMENTO!
+    salvarManutencaoDB();
+    atualizarFiltrosDinamicos();
     executarProcessamento();
 }
 
@@ -906,27 +1006,19 @@ function getPrioridadeSala(nomeSala, isPrimeiroPeriodo) {
 }
 
 
-// =========================================================
-// SISTEMA HÍBRIDO DE CARREGAMENTO (TABELA RÁPIDA / GRÁFICOS 2s)
-// =========================================================
-
 function executarProcessamento() {
-    // 1) Inicia o carregamento visual da tela inteira
     mostrarLoading(); 
     
-    // 2) Inicia o loading dos gráficos que vai rodar de forma independente
     let sp1 = document.getElementById('spinnerGrafico1');
     let sp2 = document.getElementById('spinnerGrafico2');
     if(sp1) sp1.style.display = 'flex';
     if(sp2) sp2.style.display = 'flex';
 
-    // 3) Processa a tabela rapidamente (ex: 0.5 seg) e libera a tela principal (sem travar a página)
     setTimeout(() => {
         processar(false); 
         ocultarLoading();
     }, 600);
 
-    // 4) Processa e libera os gráficos respeitando rigorosamente 2 segundos
     setTimeout(() => {
         atualizarGraficos(); 
         if(sp1) sp1.style.display = 'none';
@@ -962,7 +1054,6 @@ function construirFiltrosAvancados() {
     container.style.flexDirection = 'column';
     container.style.gap = '15px';
 
-    // Linha 1: Filtros Essenciais + Botão 'Processar'
     let divFiltros = document.createElement('div');
     divFiltros.style.display = 'flex';
     divFiltros.style.gap = '15px';
@@ -970,7 +1061,7 @@ function construirFiltrosAvancados() {
     divFiltros.style.width = '100%';
     divFiltros.style.flexWrap = 'wrap';
 
-let grpData = document.createElement('div');
+    let grpData = document.createElement('div');
     grpData.className = 'input-group';
     grpData.innerHTML = `
         <label style="font-size:12px;">Dia da Semana:</label>
@@ -1000,14 +1091,18 @@ let grpData = document.createElement('div');
     `;
     divFiltros.appendChild(grpTurno);
 
-    // BOTAO PROCESSAR ADICIONADO AO LADO DO TURNO
     let btnProcessar = document.createElement('button');
     btnProcessar.id = 'btnProcessar';
     btnProcessar.innerHTML = '▶️ Processar Dados';
-    btnProcessar.onclick = executarProcessamento; // Passou a ser manual conforme solicitado
+    btnProcessar.onclick = executarProcessamento; 
     divFiltros.appendChild(btnProcessar);
+    
+    let contadorAulas = document.createElement('div');
+    contadorAulas.id = 'contadorAulasFound';
+    contadorAulas.style.cssText = 'background: #e2e8f0; color: #1e293b; padding: 8px 15px; border-radius: 6px; font-weight: bold; font-size: 13px; border: 1px solid #cbd5e1; margin-left: 5px;';
+    contadorAulas.innerHTML = '0 AULAS ENCONTRADAS';
+    divFiltros.appendChild(contadorAulas);
 
-    // Linha 2: Outros Botões
     let divBotoes = document.createElement('div');
     divBotoes.style.display = 'flex';
     divBotoes.style.gap = '10px';
@@ -1045,7 +1140,6 @@ let grpData = document.createElement('div');
     divBotoes.appendChild(btnLimpar);
     divBotoes.appendChild(btnMaisFiltros);
 
-    // Linha 3: Filtros Ocultos 
     let divOcultos = document.createElement('div');
     divOcultos.id = 'filtrosOcultosContainer';
 
@@ -1053,7 +1147,6 @@ let grpData = document.createElement('div');
         { id: 'periodo', label: 'Período:' }, 
         { id: 'curso', label: 'Curso:' },
         { id: 'disciplina', label: 'Matéria:' },
-        { id: 'turma', label: 'Turma:' },
         { id: 'prof', label: 'Professor:' },
         { id: 'alunos', label: 'Alunos:' },
         { id: 'sala', label: 'Sala Sug.:' },
@@ -1075,6 +1168,21 @@ let grpData = document.createElement('div');
         `;
         divOcultos.appendChild(div);
     });
+
+// CAIXA DE TURMAS BLOQUEADAS (HTML)
+    let divTurmaBloq = document.createElement('div');
+    divTurmaBloq.className = 'input-group';
+    divTurmaBloq.innerHTML = `
+        <label style="font-size:12px; color:#dc3545;">Turma Bloqueada:</label>
+        <div class="custom-dd" id="dd-turmaBloqueada">
+            <div class="custom-dd-header" onclick="alternarListaSuspensa('turmaBloqueada')"><span id="lbl-turmaBloqueada">Nenhuma</span> <span>▼</span></div>
+            <div class="custom-dd-body" id="body-turmaBloqueada">
+                <input type="text" placeholder="Pesquisar..." onkeyup="filtrarListaSuspensa('turmaBloqueada', this.value)">
+                <div class="custom-dd-list" id="list-turmaBloqueada"></div>
+            </div>
+        </div>
+    `;
+    divOcultos.appendChild(divTurmaBloq);
 
     container.appendChild(divFiltros);
     container.appendChild(divBotoes);
@@ -1112,39 +1220,25 @@ function exportarCSV() {
         return;
     }
 
-    // Configuração do cabeçalho conforme solicitado
     const headers = ["dia", "Curso", "Horário", "Período", "Disciplina", "Professor(a)", "Salas"];
-    
-    // Inicia o conteúdo com o BOM para garantir acentuação correta no Excel brasileiro
     let csvContent = "\uFEFF"; 
     csvContent += headers.join(";") + "\n";
 
-    // Mapeia os dados processados para as colunas desejadas
     windowDadosResultantes.forEach(row => {
         const dia = row.diaSemana || "";
         const curso = row.curso || "";
-        // Unifica início e término no campo Horário
         const horario = `${row.horaIni} às ${row.horaFim}`;
         const periodo = row.periodoAcad || "";
         const disciplina = row.nomDisc || "";
         const professor = row.prof || "";
-        // Limpa a sala de avisos como "Forçada" ou "Proj. Ruim"
         const sala = row.salaSugerida.replace("🔒 Forçada", "").replace("⚠️ Proj. Ruim", "").trim();
 
         const linhaMapeada = [
-            `"${dia}"`,
-            `"${curso}"`,
-            `"${horario}"`,
-            `"${periodo}"`,
-            `"${disciplina}"`,
-            `"${professor}"`,
-            `"${sala}"`
+            `"${dia}"`, `"${curso}"`, `"${horario}"`, `"${periodo}"`, `"${disciplina}"`, `"${professor}"`, `"${sala}"`
         ];
-
         csvContent += linhaMapeada.join(";") + "\n";
     });
 
-    // Criação do link de download
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -1157,7 +1251,6 @@ function exportarCSV() {
 
 function sincronizarDataComDia() {
     let dIni = document.getElementById("dataInicio").value;
-    
     if (dIni) {
         let p = dIni.split('-');
         let dateObj = new Date(p[0], p[1] - 1, p[2]);
@@ -1199,9 +1292,6 @@ function selecionarOpcao(id, valorReal, textoVisivel) {
     if(inp) inp.value = "";
     
     filtrarListaSuspensa(id, "");
-    
-    // ATENÇÃO: Retirado o processamento automático daqui.
-    // O usuário agora escolherá os filtros e depois clicará no Botão "Processar Dados".
 }
 
 function atualizarFiltrosDinamicos() {
@@ -1242,15 +1332,67 @@ function atualizarFiltrosDinamicos() {
         if(lbl) lbl.innerText = 'Todos';
     }
 
-    popularLista('dia', sets.dia);
+    // GERADOR PERSONALIZADO PARA OS DIAS DA SEMANA (ORDEM CRONOLÓGICA E "HOJE")
+    let divDia = document.getElementById('list-dia');
+    if (divDia) {
+        let htmlDia = `<div class="custom-dd-option" onclick="selecionarOpcao('dia', 'TODOS', 'Todos')"><strong>Todos</strong></div>`;
+        
+        // 1. Descobre o dia de Hoje automaticamente
+        let diasNomes = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        let hojeIdx = new Date().getDay();
+        let nomeHoje = diasNomes[hojeIdx];
+        let valHoje = nomeHoje.toUpperCase(); 
+        
+        htmlDia += `<div class="custom-dd-option" style="color: #1d7bd8; font-weight: bold; background: #f0f8ff; border-radius: 4px; margin-bottom: 5px;" onclick="selecionarOpcao('dia', '${valHoje}', 'Hoje (${nomeHoje})')">📅 Hoje (${nomeHoje})</div>`;
+        
+        // 2. Imprime os dias na ordem correta (Segunda a Domingo)
+        let ordemCorreta = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
+        ordemCorreta.forEach(diaStr => {
+            if (sets.dia.has(diaStr)) {
+                let nomeVisual = diaStr.charAt(0) + diaStr.slice(1).toLowerCase();
+                htmlDia += `<div class="custom-dd-option" onclick="selecionarOpcao('dia', '${diaStr}', '${nomeVisual}')">${nomeVisual}</div>`;
+            }
+        });
+        
+        divDia.innerHTML = htmlDia;
+        filtrosSelecao['dia'] = 'TODOS';
+        let lbl = document.getElementById('lbl-dia');
+        if(lbl) lbl.innerText = 'Todos';
+    }
     popularLista('periodo', sets.periodo);
     popularLista('curso', sets.curso);
     popularLista('disciplina', sets.disciplina);
-    popularLista('turma', sets.turma);
     popularLista('prof', sets.prof);
     popularLista('alunos', sets.alunos);
     popularLista('sala', salasSet);
     popularLista('capacidade', capSet);
+
+// PREENCHIMENTO DA CAIXA (JS)
+    let divTurmaB = document.getElementById('list-turmaBloqueada');
+    if (divTurmaB) {
+        let htmlT = `
+        <div style="display: flex; gap: 5px; padding: 5px; border-bottom: 2px solid #eee; position: sticky; top: 0; background: white; z-index: 2;">
+            <button onclick="turmasOcultas=[]; salvarManutencaoDB(); atualizarFiltrosDinamicos(); executarProcessamento();" style="flex: 1; padding: 6px; font-size: 11px; background: #e2e8f0; color: #475569; border-radius: 4px; border: 1px solid #cbd5e1; cursor: pointer;">🔄 Limpar</button>
+            <button onclick="confirmarBloqueioTurmas(event)" style="flex: 1; padding: 6px; font-size: 11px; background: #1d7bd8; color: white; border-radius: 4px; border: none; cursor: pointer;">✅ OK</button>
+        </div>`;
+
+        Array.from(sets.turma).sort().forEach(val => {
+            if (val && val.trim() !== '') {
+                let vEscape = val.replace(/'/g, "\\'");
+                let isBlocked = turmasOcultas.includes(normalizarTexto(val));
+                
+                let css = isBlocked ? "color: #dc3545; text-decoration: line-through; font-weight: bold;" : "color: #334155;";
+                let txt = isBlocked ? `❌ ${val}` : val;
+                
+                htmlT += `<div class="custom-dd-option" style="${css}" onclick="toggleTurmaBloqueada('${vEscape}', event)">${txt}</div>`;
+            }
+        });
+        divTurmaB.innerHTML = htmlT;
+        
+        let lblT = document.getElementById('lbl-turmaBloqueada');
+        if (lblT) lblT.innerText = turmasOcultas.length > 0 ? `${turmasOcultas.length} Ocultadas` : 'Nenhuma';
+    }
+
 
     let divTurno = document.getElementById(`list-turno`);
     if(divTurno) {
@@ -1259,7 +1401,7 @@ function atualizarFiltrosDinamicos() {
             <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'MANHÃ', 'Manhã')">Manhã</div>
             <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'TARDE', 'Tarde')">Tarde</div>
             <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'NOITE', 'Noite')">Noite</div>
-            <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'MANHÃ/NOITE', 'Manhã/Noite')">Manhã/Noite</div>
+            <div class="custom-dd-option" onclick="selecionarOpcao('turno', 'MANHÃ/TARDE', 'Manhã/Tarde')">Manhã/Tarde</div>
         `;
         filtrosSelecao['turno'] = 'TODOS';
         let lblTurno = document.getElementById(`lbl-turno`);
@@ -1300,11 +1442,6 @@ function prepararCabecalhoTabela() {
 }
 
 construirFiltrosAvancados();
-
-
-// =========================================================
-// PROCESSAMENTO INTELIGENTE
-// =========================================================
 
 function temConflitoHorario(intervalosOcupados, horaIniNova, horaFimNova) {
     if (!horaIniNova || !horaFimNova) return false;
@@ -1411,19 +1548,23 @@ function processar(variar = false) {
         if (fs.dia !== 'TODOS' && normalizarTexto(row.diaSemana) !== normalizarTexto(fs.dia)) return false;
         if (fs.turno !== 'TODOS') {
             let tClassificado = normalizarTexto(classificarTurno(row.horaIni));
-            if (fs.turno === 'MANHÃ/NOITE') {
-                if (tClassificado !== 'MANHA' && tClassificado !== 'NOITE') return false;
+            if (fs.turno === 'MANHÃ/TARDE') {
+                if (tClassificado !== 'MANHA' && tClassificado !== 'TARDE') return false;
             } else {
                 if (tClassificado !== normalizarTexto(fs.turno)) return false;
             }
         }
+
         if (fs.periodo !== 'TODOS' && normalizarTexto(row.periodoAcad) !== normalizarTexto(fs.periodo)) return false;
         if (fs.curso !== 'TODOS' && normalizarTexto(row.curso) !== normalizarTexto(fs.curso)) return false;
         let mat = row.codDisc ? `${row.codDisc.trim()} - ${row.nomDisc.trim()}` : row.nomDisc.trim();
         if (fs.disciplina !== 'TODOS' && normalizarTexto(mat) !== normalizarTexto(fs.disciplina)) return false;
-        if (fs.turma !== 'TODOS' && normalizarTexto(row.turma) !== normalizarTexto(fs.turma)) return false;
         if (fs.prof !== 'TODOS' && normalizarTexto(row.prof) !== normalizarTexto(fs.prof)) return false;
         if (fs.alunos !== 'TODOS' && String(row.alunos) !== fs.alunos) return false;
+        
+        // Impede que a aula apareça se a turma dela estiver na lista de bloqueadas
+        if (turmasOcultas.includes(normalizarTexto(row.turma))) return false;
+        
         return true;
     });
 
@@ -1473,7 +1614,7 @@ function aplicarFiltrosTabela(fonteModificada) {
     let fs = filtrosSelecao;
     
     let filtrado = windowDadosResultantes.filter(row => {
-        if (fs.sala !== 'TODOS' && normalizarTexto(row.salaSugerida) !== normalizarTexto(fs.sala)) return false;
+        if (salasSelecionadas.length > 0 && !salasSelecionadas.includes(normalizarTexto(row.salaSugerida))) return false;
         if (fs.capacidade !== 'TODOS' && String(row.capacidade) !== fs.capacidade) return false;
         return true;
     });
@@ -1487,7 +1628,11 @@ function aplicarFiltrosTabela(fonteModificada) {
     else if (valPerc === 'asc') filtrado.sort((a, b) => a.percUso - b.percUso);
     else if (valPerc === 'desc') filtrado.sort((a, b) => b.percUso - a.percUso);
 
+    let contador = document.getElementById('contadorAulasFound');
+    if (contador) contador.innerHTML = `${filtrado.length} AULAS ENCONTRADAS`;
+
     renderizarTabela(filtrado);
+    renderizarMapaSalas();
 }
 
 function renderizarTabela(dadosParaRenderizar) {
@@ -1566,11 +1711,6 @@ function renderizarTabela(dadosParaRenderizar) {
     cascata();
 }
 
-
-// =========================================================
-// FUNÇÕES UTILITÁRIAS DE CÁLCULO E IMPORTAÇÃO
-// =========================================================
-
 function atualizarGraficos() {
     let base = windowDadosResultantes.length > 0 ? windowDadosResultantes : dados;
     if (base.length === 0) return;
@@ -1600,7 +1740,7 @@ function atualizarGraficos() {
         let mat = row.codDisc ? `${row.codDisc.trim()} - ${row.nomDisc.trim()}` : row.nomDisc.trim();
         if (fs.disciplina !== 'TODOS' && normalizarTexto(mat) !== normalizarTexto(fs.disciplina)) return false;
         if (fs.prof !== 'TODOS' && normalizarTexto(row.prof) !== normalizarTexto(fs.prof)) return false;
-        if (fs.sala !== 'TODOS' && row.salaSugerida && normalizarTexto(row.salaSugerida) !== normalizarTexto(fs.sala)) return false;
+        if (salasSelecionadas.length > 0 && (!row.salaSugerida || !salasSelecionadas.includes(normalizarTexto(row.salaSugerida)))) return false;
         if (fs.capacidade !== 'TODOS' && row.capacidade && String(row.capacidade) !== fs.capacidade) return false;
         
         return true;
@@ -1795,10 +1935,21 @@ function adicionarAulaManual() {
 }
 
 function mudarAba(evento, idAba) {
+    let abaDestino = document.getElementById(idAba);
+    let botaoClicado = evento.currentTarget;
+    
+    // Verifica se a aba clicada já está aberta
+    let jaEstaAtiva = abaDestino.classList.contains("active");
+
+    // Oculta todas as abas e reseta os botões
     document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    document.getElementById(idAba).classList.add("active");
-    evento.currentTarget.classList.add("active");
+
+    // Se ela não estava aberta, exibe com a animação. Se já estava, ela ficará oculta.
+    if (!jaEstaAtiva) {
+        abaDestino.classList.add("active");
+        botaoClicado.classList.add("active");
+    }
 }
 
 function processarArquivoCascata(event) {
@@ -1863,6 +2014,126 @@ function processarArquivoCascata(event) {
     };
     reader.readAsArrayBuffer(file);
 }
+
+// =========================================================
+// FUNÇÕES DO MAPA DE SALAS
+// =========================================================
+function renderizarMapaSalas() {
+    let container = document.getElementById('mapaSalasContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    let blocos = {};
+    salas.forEach(s => {
+        let letra = s.name.charAt(0).toUpperCase();
+        if (!blocos[letra]) blocos[letra] = [];
+        blocos[letra].push(s);
+    });
+
+    let blocosOrdenados = Object.keys(blocos).sort();
+    
+    blocosOrdenados.forEach(b => {
+        let blocoDiv = document.createElement('div');
+        blocoDiv.style.cssText = 'background: white; border: 1px solid #ccc; border-radius: 6px; padding: 10px; width: 100%;';
+        blocoDiv.innerHTML = `<h5 style="margin: 0 0 10px 0; color: #1d7bd8; font-size: 15px; border-bottom: 2px solid #eef1f5; padding-bottom: 5px;">📍 Bloco ${b}</h5>`;
+
+        let flexSalas = document.createElement('div');
+        flexSalas.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
+
+        blocos[b].forEach(sala => {
+            let btnSala = document.createElement('button');
+            
+            // MÁGICA 1: Calcula a ocupação da sala baseada nos filtros (Pega a aula mais cheia)
+            let aulasDaSala = windowDadosResultantes.filter(d => d.salaSugerida === sala.name);
+            let maxOcup = 0;
+            if (aulasDaSala.length > 0) {
+                maxOcup = Math.max(...aulasDaSala.map(a => a.percUso || 0));
+            }
+            
+            // Cria a barrinha visual (Verde, Laranja ou Vermelha)
+            let corBarra = maxOcup > 100 ? '#ef4444' : (maxOcup > 80 ? '#f59e0b' : '#10b981');
+            let barraHtml = aulasDaSala.length > 0 
+                ? `<div style="width: 100%; height: 4px; background: rgba(0,0,0,0.15); border-radius: 2px; margin-top: 4px; overflow: hidden;">
+                     <div style="height: 100%; width: ${Math.min(maxOcup, 100)}%; background: ${corBarra};"></div>
+                   </div>`
+                : `<div style="width: 100%; height: 4px; margin-top: 4px;"></div>`;
+
+            // Estilo base do botão ajustado para exibir a barrinha
+            let cssBase = 'padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 80px; transition: 0.2s; ';
+
+            if (salasEmManutencao.includes(sala.name)) {
+                btnSala.style.cssText = cssBase + 'background: #dc3545; color: white; border: none; text-decoration: line-through; opacity: 0.8;';
+            } else if (salasProjetorRuim.includes(sala.name)) {
+                btnSala.style.cssText = cssBase + 'background: #fef08a; color: #b45309; border: 1px solid #f59e0b; font-weight: bold;';
+            } else {
+                btnSala.style.cssText = cssBase + 'background: #eef1f5; color: #333; border: 1px solid #cbd5e1;';
+            }
+
+            // Injeta o Nome, a Capacidade e a Barrinha dentro do botão HTML
+            btnSala.innerHTML = `<div style="white-space: nowrap; font-weight: 600;">${sala.name} <span style="font-size:9px; opacity:0.8; font-weight: normal;">(Cap:${sala.cap})</span></div> ${barraHtml}`;
+            
+            btnSala.onclick = () => mostrarDetalhesSala(sala.name);
+            btnSala.oncontextmenu = (e) => {
+                e.preventDefault(); 
+                alternarManutencaoMapa(sala.name);
+            };
+
+            flexSalas.appendChild(btnSala);
+        });
+
+        blocoDiv.appendChild(flexSalas);
+        container.appendChild(blocoDiv);
+    });
+}
+
+function mostrarDetalhesSala(nomeSala) {
+    let painel = document.getElementById('painelDetalhesSala');
+    let titulo = document.getElementById('tituloDetalhesSala');
+    let conteudo = document.getElementById('conteudoDetalhesSala');
+
+    titulo.innerText = `Detalhes da Sala: ${nomeSala}`;
+
+    let aulasNaSala = windowDadosResultantes.filter(d => d.salaSugerida === nomeSala);
+
+    if (aulasNaSala.length === 0) {
+        conteudo.innerHTML = '<p style="color: #666; margin: 0; padding: 10px 0;">Nenhuma aula alocada nesta sala com os filtros atuais.</p>';
+    } else {
+        let diasOrdem = { "SEGUNDA":1, "TERCA":2, "TERÇA":2, "QUARTA":3, "QUINTA":4, "SEXTA":5, "SABADO":6, "SÁBADO":6 };
+        aulasNaSala.sort((a,b) => {
+            let dA = diasOrdem[normalizarTexto(a.diaSemana)] || 99;
+            let dB = diasOrdem[normalizarTexto(b.diaSemana)] || 99;
+            if(dA !== dB) return dA - dB;
+            return a.horaIni.localeCompare(b.horaIni);
+        });
+
+        let html = '<div style="display: grid; gap: 10px;">';
+        aulasNaSala.forEach(a => {
+            let ocupacao = a.capacidade ? ((a.alunos / a.capacidade) * 100).toFixed(1) : 0;
+            let corUso = ocupacao > 100 ? '#dc3545' : (ocupacao > 80 ? '#f59e0b' : '#10b981');
+            
+            // MÁGICA 2: Barra de progresso dentro do detalhe da aula
+            html += `<div style="padding: 10px; background: #f8fafc; border-left: 4px solid ${corUso}; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <strong style="color: #0f172a;">${a.diaSemana} - ${a.horaIni} às ${a.horaFim}</strong><br>
+                        <span style="color: #334155; font-weight: bold;">Prof: ${a.prof}</span><br>
+                        <span style="color: #64748b; font-size: 12px;">${a.curso} | ${a.nomDisc}</span><br>
+                        
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                            <span style="font-size: 11px; color: #475569; white-space: nowrap;">${a.alunos} / ${a.capacidade} alunos</span>
+                            <div style="flex-grow: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                                <div style="height: 100%; width: ${Math.min(ocupacao, 100)}%; background: ${corUso};"></div>
+                            </div>
+                            <span style="font-size: 11px; font-weight: bold; color: ${corUso};">${ocupacao}%</span>
+                        </div>
+                     </div>`;
+        });
+        html += '</div>';
+        conteudo.innerHTML = html;
+    }
+
+    painel.style.display = 'block';
+    painel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 </script>
 </body>
 </html>
